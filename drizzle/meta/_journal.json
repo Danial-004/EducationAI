@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1763978910089,
+      "tag": "0000_colossal_the_phantom",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1763986147781,
+      "tag": "0001_same_xavin",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1764002923603,
+      "tag": "0002_gorgeous_speed",
+      "breakpoints": true
+    }
+  ]
+}
