@@ -71,22 +71,29 @@ async function main() {
         console.log(`✅ Created modules: ${module1.title}, ${module2.title}`);
 
         // 5. Create Materials
+        // 5. Create Materials
         console.log("📝 Creating materials...");
         await db.insert(schema.materials).values([
             {
                 moduleId: module1.id,
                 type: "text",
-                content: "# Welcome to Python\\n\\nPython is a high-level, interpreted programming language known for its simplicity and readability.",
+                title: "Introduction to Python", // ҚОСЫЛДЫ
+                order: 1,                       // ҚОСЫЛДЫ
+                content: "# Welcome to Python\n\nPython is a high-level, interpreted programming language known for its simplicity and readability.",
             },
             {
                 moduleId: module1.id,
                 type: "video",
-                content: "https://www.youtube.com/embed/_uQrJ0TkZlc", // Example Python URL
+                title: "Python Tutorial Video",  // ҚОСЫЛДЫ
+                order: 2,                       // ҚОСЫЛДЫ
+                content: "https://www.youtube.com/embed/_uQrJ0TkZlc",
             },
             {
                 moduleId: module2.id,
                 type: "text",
-                content: "# Advanced AI\\n\\nNow we will learn about Neural Networks and LLMs.",
+                title: "Advanced AI Concepts",  // ҚОСЫЛДЫ
+                order: 1,                       // ҚОСЫЛДЫ
+                content: "# Advanced AI\n\nNow we will learn about Neural Networks and LLMs.",
             },
         ]);
         console.log("✅ Created materials");
@@ -104,7 +111,7 @@ async function main() {
             .returning();
 
         await db.insert(schema.answers).values([
-            { questionId: q1.id, text: "Readability and Simplicity", isCorrect: true },
+            { questionId: q1.id, text: "Readability and Si  mplicity", isCorrect: true },
             { questionId: q1.id, text: "Complex Syntax", isCorrect: false },
             { questionId: q1.id, text: "Manual Memory Management", isCorrect: false },
         ]);
