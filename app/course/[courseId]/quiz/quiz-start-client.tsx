@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Loader2, PlayCircle } from "lucide-react";
 import { generateQuiz } from "@/app/actions/generate-quiz";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/contexts/language-context";
 
 interface Answer {
     id: string;
@@ -30,6 +31,7 @@ interface QuizStartClientProps {
 }
 
 export function QuizStartClient({ questions, courseId, moduleId }: QuizStartClientProps) {
+    const { t } = useLanguage();
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [quizReady, setQuizReady] = useState(questions.length > 0);
@@ -76,11 +78,11 @@ export function QuizStartClient({ questions, courseId, moduleId }: QuizStartClie
                 </div>
 
                 <div>
-                    <h2 className="text-2xl font-bold mb-2">Ready to Test Your Knowledge?</h2>
+                    <h2 className="text-2xl font-bold mb-2">{t.quizReadyTitle}</h2>
                     <p className="text-muted-foreground">
                         {questions.length > 0
-                            ? "Start the adaptive quiz and track your progress"
-                            : "We'll generate personalized questions based on your lessons"}
+                            ? t.quizReadyDesc
+                            : t.quizGenDesc}
                     </p>
                 </div>
 
@@ -100,12 +102,12 @@ export function QuizStartClient({ questions, courseId, moduleId }: QuizStartClie
                     {isGenerating ? (
                         <>
                             <Loader2 className="h-5 w-5 animate-spin" />
-                            Generating unique questions...
+                            {t.generatingQuiz}
                         </>
                     ) : (
                         <>
                             <PlayCircle className="h-5 w-5" />
-                            Start Quiz
+                            {t.startQuizButton}
                         </>
                     )}
                 </Button>

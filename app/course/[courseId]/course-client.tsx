@@ -95,7 +95,7 @@ export function CoursePageClient({
                     <div className="space-y-4">
                         <div className="flex items-center gap-2 text-muted-foreground">
                             <Loader2 className="h-5 w-5 animate-spin" />
-                            <span>Generating lesson content with AI...</span>
+                            <span>{t.generatingContent}</span>
                         </div>
                         <Skeleton className="h-8 w-3/4" />
                         <Skeleton className="h-4 w-full" />
@@ -107,7 +107,7 @@ export function CoursePageClient({
                     </div>
                 ) : error ? (
                     <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
-                        <p className="text-destructive font-medium">Error loading lesson</p>
+                        <p className="text-destructive font-medium">{t.errorLoading}</p>
                         <p className="text-sm text-muted-foreground mt-1">{error}</p>
                     </div>
                 ) : activeMaterial?.type === "video" ? (

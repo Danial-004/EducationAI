@@ -44,6 +44,29 @@ export interface Translations {
 
     // Activity/Progress
     noActivity: string;
+    generatingContent: string;
+    errorLoading: string;
+    finalExam: string;
+    bossLevel: string;
+
+    // Quiz Client (Жаңалары)
+    quizReadyTitle: string;
+    quizReadyDesc: string;
+    quizGenDesc: string;
+    generatingQuiz: string;
+    startQuizButton: string;
+
+    // Landing Page (Басты бет)
+    heroTitle: string;
+    heroSubtitle: string;
+    getStarted: string;
+    featuresTitle: string;
+    feature1Title: string;
+    feature1Desc: string;
+    feature2Title: string;
+    feature2Desc: string;
+    feature3Title: string;
+    feature3Desc: string;
 
 }
 
@@ -85,6 +108,25 @@ export const translations: Record<Language, Translations> = {
         days: 'Days',
         keepItUp: 'Keep the fire burning!',
         topLearner: 'Top 5% of learners',
+        generatingContent: 'Generating lesson content with AI...',
+        errorLoading: 'Error loading lesson',
+        finalExam: 'Final Exam',
+        bossLevel: 'BOSS',
+        quizReadyTitle: 'Ready to Test Your Knowledge?',
+        quizReadyDesc: 'Start the adaptive quiz and track your progress',
+        quizGenDesc: "We'll generate personalized questions based on your lessons",
+        generatingQuiz: 'Generating unique questions...',
+        startQuizButton: 'Start Quiz',
+        heroTitle: 'Master Any Subject with AI',
+        heroSubtitle: 'Experience adaptive learning powered by cutting-edge AI. Get personalized quizzes, instant help, and track your progress.',
+        getStarted: 'Get Started',
+        featuresTitle: 'Everything you need to excel',
+        feature1Title: 'Adaptive Tests',
+        feature1Desc: 'AI-generated quizzes that adapt to your skill level.',
+        feature2Title: 'AI Tutor',
+        feature2Desc: 'Get instant help powered by Google Gemini.',
+        feature3Title: 'Progress Tracking',
+        feature3Desc: 'Monitor your learning journey with detailed analytics.',
     },
     ru: {
         dashboard: 'Панель управления',
@@ -123,6 +165,25 @@ export const translations: Record<Language, Translations> = {
         days: 'Дней',
         keepItUp: 'Так держать!',
         topLearner: 'Топ 5% учеников',
+        generatingContent: 'Генерация контента с ИИ...',
+        errorLoading: 'Ошибка загрузки урока',
+        finalExam: 'Финальный экзамен',
+        bossLevel: 'БОСС',
+        quizReadyTitle: 'Готовы проверить знания?',
+        quizReadyDesc: 'Начните адаптивный тест и отслеживайте прогресс',
+        quizGenDesc: "Мы создадим персональные вопросы на основе ваших уроков",
+        generatingQuiz: 'Создание уникальных вопросов...',
+        startQuizButton: 'Начать тест',
+        heroTitle: 'Освойте любой предмет с ИИ',
+        heroSubtitle: 'Адаптивное обучение на базе передового ИИ. Персональные тесты, мгновенная помощь и отслеживание прогресса.',
+        getStarted: 'Начать',
+        featuresTitle: 'Всё, что нужно для успеха',
+        feature1Title: 'Адаптивные тесты',
+        feature1Desc: 'Тесты от ИИ, которые подстраиваются под ваш уровень.',
+        feature2Title: 'AI Репетитор',
+        feature2Desc: 'Мгновенная помощь на базе Google Gemini.',
+        feature3Title: 'Отслеживание прогресса',
+        feature3Desc: 'Следите за своим обучением с подробной аналитикой.',
     },
     kz: {
         dashboard: 'Басқару тақтасы',
@@ -161,5 +222,24 @@ export const translations: Record<Language, Translations> = {
         days: 'Күн',
         keepItUp: 'Жарайсың, осылай жалғастыр!',
         topLearner: 'Оқушылардың үздік 5%-ы',
+        generatingContent: 'ЖИ көмегімен мазмұн жасалуда...',
+        errorLoading: 'Сабақты жүктеу қатесі',
+        finalExam: 'Қорытынды емтихан',
+        bossLevel: 'ФИНАЛ',
+        quizReadyTitle: 'Біліміңізді тексеруге дайынсыз ба?',
+        quizReadyDesc: 'Адаптивті тестті бастаңыз және прогресті бақылаңыз',
+        quizGenDesc: "Біз сабақтарыңызға негізделген жеке сұрақтарды құрастырамыз",
+        generatingQuiz: 'Бірегей сұрақтар жасалуда...',
+        startQuizButton: 'Тестті бастау',
+        heroTitle: 'ЖИ көмегімен кез келген пәнді меңгеріңіз',
+        heroSubtitle: 'Жасанды интеллект негізіндегі адаптивті оқыту. Жеке тесттер, жылдам көмек және прогресті қадағалау.',
+        getStarted: 'Бастау',
+        featuresTitle: 'Жетістікке жету үшін қажеттінің бәрі',
+        feature1Title: 'Адаптивті тесттер',
+        feature1Desc: 'Сіздің деңгейіңізге бейімделетін ЖИ құрастырған тесттер.',
+        feature2Title: 'AI Тьютор',
+        feature2Desc: 'Google Gemini негізіндегі жылдам көмек.',
+        feature3Title: 'Прогресті бақылау',
+        feature3Desc: 'Толық аналитика арқылы оқу жолыңызды қадағалаңыз.',
     },
 };

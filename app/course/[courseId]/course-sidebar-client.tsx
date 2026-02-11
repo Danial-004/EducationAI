@@ -69,9 +69,9 @@ export function CourseSidebarClient({
                     className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold transition-all bg-gradient-to-r from-yellow-500/20 to-orange-500/20 hover:from-yellow-500/30 hover:to-orange-500/30 border-2 border-yellow-500/30 hover:border-yellow-500/50 text-yellow-700 dark:text-yellow-400"
                 >
                     <GraduationCap className="h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400 animate-pulse" />
-                    <span>Final Exam</span>
+                    <span>{t.finalExam}</span>
                     <div className="ml-auto text-xs bg-yellow-500 text-white px-2 py-0.5 rounded-full">
-                        BOSS
+                        {t.bossLevel}
                     </div>
                 </Link>
             </div>
