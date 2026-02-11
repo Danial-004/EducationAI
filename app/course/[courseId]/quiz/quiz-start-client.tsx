@@ -46,14 +46,14 @@ export function QuizStartClient({ questions, courseId, moduleId }: QuizStartClie
         setError(null);
 
         try {
-            const result = await generateQuiz(moduleId);
+            const result = await generateQuiz(moduleId, courseId);
 
             if (result.success) {
                 // Refresh the page to load the new questions
                 router.refresh();
                 setQuizReady(true);
             } else {
-                setError(result.error || "Failed to generate quiz");
+                setError("Failed to generate quiz");
             }
         } catch (err: any) {
             setError(err.message || "An error occurred");

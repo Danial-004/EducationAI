@@ -42,7 +42,7 @@ export function CreateCourseDialog() {
 
         setIsLoading(true);
         try {
-            const result = await generateCourse(topic, language);
+            const result = await generateCourse(topic);
             if (result.success && result.courseId) {
                 toast.success("Course created successfully!", {
                     description: `"${topic}" is ready to explore.`,
@@ -52,19 +52,10 @@ export function CreateCourseDialog() {
                 router.push(`/course/${result.courseId}`);
                 router.refresh();
             } else {
-                // Check for rate limit error
-                const errorMessage = result.error || "";
-                if (errorMessage.includes("429") || errorMessage.toLowerCase().includes("resource has been exhausted")) {
-                    toast.error("AI is cooling down", {
-                        description: "Please wait 60 seconds before creating a new course.",
-                        duration: 5000,
-                    });
-                    setCooldown(60);
-                } else {
-                    toast.error("Failed to generate course", {
-                        description: errorMessage || "Please try again.",
-                    });
-                }
+                // Handle generic failure when success is false
+                toast.error("Course Generation Failed", {
+                    description: "The AI encountered an unknown issue or validation error. Check console logs.",
+                });
             }
         } catch (error: any) {
             console.error("Error:", error);

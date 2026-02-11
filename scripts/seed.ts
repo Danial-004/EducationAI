@@ -26,11 +26,22 @@ async function main() {
         await db.delete(schema.courses);
         console.log("✅ Cleared existing data");
 
-        // 2. Create Course
+        // 2. Fetch Admin/Seed User
+        console.log("👤 Fetching user...");
+        const adminUser = await db.query.users.findFirst();
+        if (!adminUser) {
+            console.error("❌ ERROR: No user found in the database. Please register an account first via /auth.");
+            process.exit(1);
+        }
+        const adminId = adminUser.id;
+        console.log(`✅ Found user: ${adminUser.name || adminUser.email}`);
+
+        // 3. Create Course
         console.log("📚 Creating course...");
         const [course] = await db
             .insert(schema.courses)
             .values({
+                userId: adminId, // CRITICAL FIX: Adding required userId
                 title: "Introduction to Python AI",
                 description: "Master Python basics and learn how to build AI applications with Gemini integration.",
                 published: true,
@@ -38,7 +49,7 @@ async function main() {
             .returning();
         console.log(`✅ Created course: ${course.title}`);
 
-        // 3. Create Modules
+        // 4. Create Modules
         console.log("📖 Creating modules...");
         const [module1] = await db
             .insert(schema.modules)
@@ -59,7 +70,7 @@ async function main() {
             .returning();
         console.log(`✅ Created modules: ${module1.title}, ${module2.title}`);
 
-        // 4. Create Materials
+        // 5. Create Materials
         console.log("📝 Creating materials...");
         await db.insert(schema.materials).values([
             {
@@ -80,7 +91,7 @@ async function main() {
         ]);
         console.log("✅ Created materials");
 
-        // 5. Create Questions
+        // 6. Create Questions
         console.log("❓ Creating questions...");
         const [q1] = await db
             .insert(schema.questions)
