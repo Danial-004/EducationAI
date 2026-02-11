@@ -99,15 +99,19 @@ async function main() {
         console.log("✅ Created materials");
 
         // 6. Create Questions
+        // 6. Create Questions
         console.log("❓ Creating questions...");
         const [q1] = await db
             .insert(schema.questions)
-            .values({
-                moduleId: module1.id,
-                question: "What is Python primarily known for?",
-                difficulty: 1,
-                type: "choice",
-            })
+            .values([ // Мұнда массив жақшасы [ қосылуы керек
+                {
+                    moduleId: module1.id,
+                    question: "What is Python primarily known for?",
+                    difficulty: 1,
+                    type: "multiple-choice", // "choice" дегенді "multiple-choice"-қа ауыстырдық
+                    order: 1, // Егер схемада міндетті болса, мұны да қосыңыз
+                }
+            ])
             .returning();
 
         await db.insert(schema.answers).values([
