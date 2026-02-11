@@ -71,7 +71,7 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
             <AiTutor courseTitle={course.title} />
 
             {/* Sidebar */}
-            <div className="hidden md:block w-80 border-r border-border bg-muted/30 overflow-y-auto">
+            <div className="w-full md:w-80 h-auto md:h-full max-h-[30vh] md:max-h-none border-b md:border-r border-border bg-muted/30 overflow-y-auto">
                 <div className="p-4 border-b border-border flex items-center gap-2">
                     <Link href="/dashboard">
                         <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -87,8 +87,6 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
                     courseId={courseId}
                     activeMaterialId={activeMaterial?.id}
                 />
-                <div className="flex-1 w-full overflow-y-auto bg-background">
-                </div>
             </div>
 
             {/* Main Content */}
