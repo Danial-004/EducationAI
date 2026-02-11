@@ -103,13 +103,13 @@ async function main() {
         console.log("❓ Creating questions...");
         const [q1] = await db
             .insert(schema.questions)
-            .values([ // Мұнда массив жақшасы [ қосылуы керек
+            .values([
                 {
                     moduleId: module1.id,
                     question: "What is Python primarily known for?",
                     difficulty: 1,
                     type: "multiple-choice", // "choice" дегенді "multiple-choice"-қа ауыстырдық
-                    order: 1, // Егер схемада міндетті болса, мұны да қосыңыз
+                    // Егер схемада міндетті болса, мұны да қосыңыз
                 }
             ])
             .returning();
