@@ -19,13 +19,13 @@ const geistMono = Geist_Mono({
 
 // 1. Metadata ішінен themeColor алынып тасталды
 export const metadata: Metadata = {
-  title: "SmartTutor AI - Master Any Subject with AI",
+  title: "EducationAI - Master Any Subject with AI",
   description: "Adaptive learning platform powered by AI. Get personalized quizzes, instant help, and track your progress.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "SmartTutor",
+    title: "EducationAI",
   },
 };
 
