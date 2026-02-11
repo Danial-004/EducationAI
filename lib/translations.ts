@@ -18,6 +18,15 @@ export interface Translations {
     noCoursesYet: string;
     checkBackSoon: string;
     generateCourseButton: string;
+    yourCourses: string;
+    currentLevel: string;
+    streak: string;
+    totalXp: string;
+    weeklyGoal: string;
+    lessonsCompleted: string;
+    days: string;
+    keepItUp: string;
+    topLearner: string;
 
     // Navigation
     signIn: string;
@@ -35,6 +44,7 @@ export interface Translations {
 
     // Activity/Progress
     noActivity: string;
+
 }
 
 export const translations: Record<Language, Translations> = {
@@ -66,6 +76,15 @@ export const translations: Record<Language, Translations> = {
         startLearning: 'Start Learning',
         selectLessonToStart: 'Select a lesson to start learning',
         noActivity: 'Complete quizzes to see your progress here',
+        yourCourses: 'Your Courses',
+        currentLevel: 'Current Level',
+        streak: 'Daily Streak',
+        totalXp: 'Total XP',
+        weeklyGoal: 'Weekly Goal',
+        lessonsCompleted: 'Lessons completed',
+        days: 'Days',
+        keepItUp: 'Keep the fire burning!',
+        topLearner: 'Top 5% of learners',
     },
     ru: {
         dashboard: 'Панель управления',
@@ -95,6 +114,15 @@ export const translations: Record<Language, Translations> = {
         startLearning: 'Начать обучение',
         selectLessonToStart: 'Выберите урок, чтобы начать обучение',
         noActivity: 'Пройдите тесты, чтобы увидеть свой прогресс',
+        yourCourses: 'Ваши курсы',
+        currentLevel: 'Текущий уровень',
+        streak: 'Дневная серия',
+        totalXp: 'Всего XP',
+        weeklyGoal: 'Еженедельная цель',
+        lessonsCompleted: 'Уроков завершено',
+        days: 'Дней',
+        keepItUp: 'Так держать!',
+        topLearner: 'Топ 5% учеников',
     },
     kz: {
         dashboard: 'Басқару тақтасы',
@@ -124,5 +152,14 @@ export const translations: Record<Language, Translations> = {
         startLearning: 'Оқуды бастау',
         selectLessonToStart: 'Оқуды бастау үшін сабақты таңдаңыз',
         noActivity: 'Прогресті көру үшін тестерді тапсырыңыз',
+        yourCourses: 'Сіздің курстарыңыз',
+        currentLevel: 'Ағымдағы деңгей',
+        streak: 'Үздіксіздік',
+        totalXp: 'Жалпы XP',
+        weeklyGoal: 'Апталық мақсат',
+        lessonsCompleted: 'Аяқталған сабақтар',
+        days: 'Күн',
+        keepItUp: 'Жарайсың, осылай жалғастыр!',
+        topLearner: 'Оқушылардың үздік 5%-ы',
     },
 };
