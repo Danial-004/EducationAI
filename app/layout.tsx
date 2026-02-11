@@ -1,11 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next"; // Viewport типі қосылды
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
-
 import { LanguageProvider } from "@/contexts/language-context";
 
 const geistSans = Geist({
@@ -18,16 +17,23 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// 1. Metadata ішінен themeColor алынып тасталды
 export const metadata: Metadata = {
   title: "SmartTutor AI - Master Any Subject with AI",
   description: "Adaptive learning platform powered by AI. Get personalized quizzes, instant help, and track your progress.",
   manifest: "/manifest.json",
-  themeColor: "#ffffff",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "SmartTutor",
   },
+};
+
+// 2. themeColor жаңа viewport экспортына көшірілді
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
