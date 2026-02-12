@@ -1,6 +1,6 @@
 {
-    "name": "SmartTutor",
-    "short_name": "SmartTutor",
+    "name": "EducationAI",
+    "short_name": "EducationAI",
     "description": "Adaptive learning platform powered by AI",
     "start_url": "/",
     "display": "standalone",

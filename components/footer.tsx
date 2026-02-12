@@ -9,7 +9,7 @@ export function Footer() {
                 <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
                     {/* Copyright */}
                     <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                        © {currentYear} SmartTutor AI. All rights reserved.
+                        © {currentYear} Education AI. All rights reserved.
                     </p>
 
                     {/* Links */}

@@ -19,7 +19,7 @@ export async function Navbar() {
                         <GraduationCap className="h-5 w-5 text-white" />
                     </div>
                     <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                        SmartTutor
+                        Education
                     </span>
                 </Link>
 

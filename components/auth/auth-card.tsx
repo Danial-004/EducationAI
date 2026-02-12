@@ -84,7 +84,7 @@ export function AuthCard() {
             <Card className="w-full max-w-md shadow-2xl border-white/10 backdrop-blur-md bg-card/80">
                 <CardHeader className="text-center space-y-1">
                     <CardTitle className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-violet-600">
-                        SmartTutor AI
+                        Education AI
                     </CardTitle>
                     <CardDescription>
                         Your personal AI learning companion

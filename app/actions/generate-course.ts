@@ -13,7 +13,7 @@ const EMERGENCY_API_KEY = "AIzaSyBnRZO--ZF71Fztk9W8EiDI2b4vGKqtwVQ"; // Твой
 
 // === 🟧 PHASE 2.1: GLOBAL AI POLICY ===
 const SYSTEM_POLICY = `
-ROLE: You are SmartTutor AI, a strict Academic Course Architect.
+ROLE: You are Education AI, a strict Academic Course Architect.
 GOAL: Create a comprehensive, university-grade curriculum.
 POLICY:
 1. NO "lazy" generation. Courses must be deep and detailed.
