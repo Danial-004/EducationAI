@@ -52,7 +52,7 @@ export async function generateLessonContent(materialId: string, userLanguage?: s
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         // Ескерту: "gemini-2.5-flash" әлі шықпаған болуы мүмкін, қазіргі стандарт "gemini-1.5-flash"
-        const model = genAI.getGenerativeModel({ model: "gemini-3.0-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         // 4. Generate content with Gemini - ENFORCED ACADEMIC STRUCTURE
         const moduleTitle = lesson.module.title;
