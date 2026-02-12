@@ -22,12 +22,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
     providers: [
         Google({
-            clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            clientId: process.env.AUTH_GOOGLE_ID,
+            clientSecret: process.env.AUTH_GOOGLE_SECRET,
         }),
         GitHub({
-            clientId: process.env.GITHUB_CLIENT_ID,
-            clientSecret: process.env.GITHUB_CLIENT_SECRET,
+            clientId: process.env.AUTH_GITHUB_ID,
+            clientSecret: process.env.AUTH_GITHUB_SECRET,
         }),
         Credentials({
             name: 'credentials',
@@ -66,6 +66,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     ],
     session: {
         strategy: 'jwt',
+        maxAge: 30 * 24 * 60 * 60,
     },
     callbacks: {
         async session({ session, token }) {
