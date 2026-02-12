@@ -22,7 +22,7 @@ export default async function DashboardPage() {
 
     // 2. Базадан курстарды аламыз
     const userCourses = await db.query.courses.findMany({
-        where: eq(courses.userId, session.user.id),
+        //where: eq(courses.userId, session.user.id),
         with: {
             modules: {
                 with: {
