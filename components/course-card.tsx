@@ -1,52 +1,65 @@
-'use client';
-
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { BookOpen, PlayCircle, ArrowRight } from 'lucide-react';
-import { useLanguage } from '@/contexts/language-context';
+import Link from "next/link";
+import Image from "next/image";
+import { BookOpen } from "lucide-react";
 
 interface CourseCardProps {
     id: string;
     title: string;
+    imageUrl: string | null;
+    chaptersLength: number;
+    price: number;
+    progress: number | null;
+    category: string | null;
     description: string | null;
-    moduleCount?: number;
 }
 
-export function CourseCard({ id, title, description, moduleCount = 0 }: CourseCardProps) {
-    const { t } = useLanguage();
-
+export const CourseCard = ({
+    id,
+    title,
+    imageUrl,
+    chaptersLength,
+    price,
+    progress,
+    category,
+    description
+}: CourseCardProps) => {
     return (
-        <div className="group relative overflow-hidden rounded-xl border border-zinc-200 bg-white p-6 shadow-sm transition-all hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
-            {/* Card Header */}
-            <div className="mb-4 flex items-start justify-between">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-500">
-                    <BookOpen className="h-6 w-6 text-white" />
+        <Link href={`/course/${id}`}>
+            <div className="group hover:shadow-sm transition overflow-hidden border rounded-lg p-3 h-full">
+                <div className="relative w-full aspect-video rounded-md overflow-hidden bg-slate-200 dark:bg-slate-800">
+                    {/* Егер сурет болса көрсетеміз, болмаса заглушка */}
+                    {imageUrl ? (
+                        <Image
+                            fill
+                            className="object-cover"
+                            alt={title}
+                            src={imageUrl}
+                        />
+                    ) : (
+                        <div className="flex items-center justify-center h-full w-full bg-gradient-to-r from-blue-500 to-purple-600">
+                            <span className="text-white font-bold text-2xl">
+                                {title.charAt(0).toUpperCase()}
+                            </span>
+                        </div>
+                    )}
                 </div>
-                {moduleCount > 0 && (
-                    <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                        {moduleCount} {moduleCount === 1 ? t.module : t.modules}
-                    </span>
-                )}
+                <div className="flex flex-col pt-2">
+                    <div className="text-lg md:text-base font-medium group-hover:text-sky-700 transition line-clamp-2">
+                        {title}
+                    </div>
+                    <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                        {description || "No description provided"}
+                    </p>
+                    <div className="my-3 flex items-center gap-x-2 text-sm md:text-xs">
+                        <div className="flex items-center gap-x-1 text-slate-500">
+                            <BookOpen className="h-4 w-4" />
+                            <span>
+                                {chaptersLength} {chaptersLength === 1 ? "Module" : "Modules"}
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            {/* Card Content */}
-            <div className="mb-6">
-                <h3 className="mb-2 text-xl font-semibold text-foreground">
-                    {title}
-                </h3>
-                <p className="line-clamp-3 text-sm text-muted-foreground">
-                    {description || 'No description available'}
-                </p>
-            </div>
-
-            {/* Card Footer */}
-            <Link href={`/course/${id}`}>
-                <Button variant="primary" className="w-full group-hover:shadow-md">
-                    <PlayCircle className="h-4 w-4" />
-                    {t.startLearning}
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Button>
-            </Link>
-        </div>
+        </Link>
     );
-}
+};

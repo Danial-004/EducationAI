@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react'; // useEffect алып тастадым, себебі енді қолмен басамыз
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, PlayCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { ChevronRight, PlayCircle, CheckCircle, Loader2, Globe, Sparkles } from 'lucide-react'; // Globe, Sparkles қосылды
 import { useLanguage } from '@/contexts/language-context';
 import { MarkdownText } from '@/components/markdown-text';
 import { VideoPlayer } from '@/components/video-player';
@@ -37,33 +37,31 @@ export function CoursePageClient({
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Generate content on-demand if empty
-    useEffect(() => {
-        async function loadContent() {
-            if (activeMaterial && (!activeMaterial.content || activeMaterial.content.length < 50)) {
-                setIsGenerating(true);
-                setError(null);
+    // Тілді таңдауға арналған state (Default: Russian)
+    const [genLanguage, setGenLanguage] = useState("Russian");
 
-                try {
-                    const result = await generateLessonContent(activeMaterial.id);
+    // 1. Generate функциясы (Батырма басқанда жұмыс істейді)
+    const handleGenerate = async () => {
+        if (!activeMaterial) return;
 
-                    if (result.success && result.content) {
-                        setContent(result.content);
-                    } else {
-                        setError(result.error || "Failed to generate lesson content");
-                    }
-                } catch (err: any) {
-                    setError(err.message || "An error occurred");
-                } finally {
-                    setIsGenerating(false);
-                }
-            } else if (activeMaterial?.content) {
-                setContent(activeMaterial.content);
+        setIsGenerating(true);
+        setError(null);
+
+        try {
+            // Тілді екінші параметр қылып жібереміз
+            const result = await generateLessonContent(activeMaterial.id, genLanguage);
+
+            if (result.success && result.content) {
+                setContent(result.content);
+            } else {
+                setError(result.error || "Failed to generate lesson content");
             }
+        } catch (err: any) {
+            setError(err.message || "An error occurred");
+        } finally {
+            setIsGenerating(false);
         }
-
-        loadContent();
-    }, [activeMaterial?.id]);
+    };
 
     if (!activeMaterial) {
         return (
@@ -79,23 +77,44 @@ export function CoursePageClient({
     return (
         <>
             <div className="mb-8 border-b border-border pb-8">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                    <span>{moduleName}</span>
-                    <span>•</span>
-                    <span>{activeMaterial.type === "video" ? t.videoLesson : t.readingMaterial}</span>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                            <span>{moduleName}</span>
+                            <span>•</span>
+                            <span>{activeMaterial.type === "video" ? t.videoLesson : t.readingMaterial}</span>
+                        </div>
+                        <h1 className="text-3xl font-bold text-foreground">
+                            {t.lesson} {lessonNumber}
+                        </h1>
+                    </div>
+
+                    {/* ТІЛ ТАҢДАУ (Егер контент жоқ болса немесе өте аз болса ғана шығады) */}
+                    {(!content || content.length < 50) && (
+                        <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-lg border">
+                            <Globe className="h-4 w-4 text-muted-foreground" />
+                            <select
+                                className="bg-transparent text-sm font-medium focus:outline-none cursor-pointer"
+                                value={genLanguage}
+                                onChange={(e) => setGenLanguage(e.target.value)}
+                            >
+                                <option value="Kazakh">🇰🇿 Қазақша</option>
+                                <option value="Russian">🇷🇺 Русский</option>
+                                <option value="English">🇺🇸 English</option>
+                            </select>
+                        </div>
+                    )}
                 </div>
-                <h1 className="text-3xl font-bold text-foreground">
-                    {t.lesson} {lessonNumber}
-                </h1>
             </div>
 
-            {/* Content Area with Loading State */}
+            {/* Content Area */}
             <div className="prose prose-zinc dark:prose-invert max-w-none mb-8">
+                {/* Егер генерация жүріп жатса */}
                 {isGenerating ? (
                     <div className="space-y-4">
                         <div className="flex items-center gap-2 text-muted-foreground">
                             <Loader2 className="h-5 w-5 animate-spin" />
-                            <span>{t.generatingContent}</span>
+                            <span>Creating lesson in {genLanguage}...</span>
                         </div>
                         <Skeleton className="h-8 w-3/4" />
                         <Skeleton className="h-4 w-full" />
@@ -103,37 +122,60 @@ export function CoursePageClient({
                         <Skeleton className="h-4 w-5/6" />
                         <Skeleton className="h-8 w-2/3 mt-6" />
                         <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-4/5" />
                     </div>
                 ) : error ? (
                     <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
                         <p className="text-destructive font-medium">{t.errorLoading}</p>
                         <p className="text-sm text-muted-foreground mt-1">{error}</p>
+                        <Button variant="outline" size="sm" onClick={handleGenerate} className="mt-4">
+                            Try Again
+                        </Button>
                     </div>
-                ) : activeMaterial?.type === "video" ? (
-                    <VideoPlayer url={content} />
+                ) : (!content || content.length < 50) ? (
+                    // ЕГЕР КОНТЕНТ ЖОҚ БОЛСА -> GENERATE BUTTON
+                    <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed rounded-lg bg-muted/30">
+                        <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
+                            <Sparkles className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <h3 className="text-lg font-semibold mb-2">Ready to Learn?</h3>
+                        <p className="text-muted-foreground mb-6 text-center max-w-md">
+                            Select your preferred language above and let AI create a personalized lesson for you.
+                        </p>
+                        <Button onClick={handleGenerate} size="lg" className="gap-2 bg-blue-600 hover:bg-blue-700 text-white">
+                            <Sparkles className="h-4 w-4" />
+                            Generate Lesson ({genLanguage})
+                        </Button>
+                    </div>
                 ) : (
-                    <MarkdownText content={content} />
+                    // ЕГЕР КОНТЕНТ БАР БОЛСА -> SHOW CONTENT
+                    activeMaterial?.type === "video" ? (
+                        <VideoPlayer url={content} />
+                    ) : (
+                        <MarkdownText content={content} />
+                    )
                 )}
             </div>
 
-            <div className="flex justify-end pt-8 border-t border-border">
-                {nextMaterial ? (
-                    <Link href={`/course/${courseId}?materialId=${nextMaterial.id}`}>
-                        <Button size="lg" className="gap-2">
-                            {t.nextLesson}
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
-                    </Link>
-                ) : (
-                    <Link href={`/course/${courseId}/quiz`}>
-                        <Button size="lg" className="gap-2 bg-green-600 hover:bg-green-700 text-white">
-                            {t.takeQuiz}
-                            <CheckCircle className="h-4 w-4" />
-                        </Button>
-                    </Link>
-                )}
-            </div>
+            {/* Footer Navigation (Тек контент бар кезде шығады) */}
+            {content && content.length > 50 && (
+                <div className="flex justify-end pt-8 border-t border-border">
+                    {nextMaterial ? (
+                        <Link href={`/course/${courseId}?materialId=${nextMaterial.id}`}>
+                            <Button size="lg" className="gap-2">
+                                {t.nextLesson}
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                        </Link>
+                    ) : (
+                        <Link href={`/course/${courseId}/quiz`}>
+                            <Button size="lg" className="gap-2 bg-green-600 hover:bg-green-700 text-white">
+                                {t.takeQuiz}
+                                <CheckCircle className="h-4 w-4" />
+                            </Button>
+                        </Link>
+                    )}
+                </div>
+            )}
         </>
     );
 }
