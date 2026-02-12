@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react'; // useEffect алып тастадым, себебі енді қолмен басамыз
+// 1. useEffect импорттауды ұмытпаңыз!
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, PlayCircle, CheckCircle, Loader2, Globe, Sparkles } from 'lucide-react'; // Globe, Sparkles қосылды
+import { ChevronRight, PlayCircle, CheckCircle, Loader2, Globe, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
 import { MarkdownText } from '@/components/markdown-text';
 import { VideoPlayer } from '@/components/video-player';
@@ -33,14 +34,24 @@ export function CoursePageClient({
     nextMaterial
 }: CoursePageClientProps) {
     const { t } = useLanguage();
+
+    // State
     const [content, setContent] = useState(activeMaterial?.content || "");
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
-    // Тілді таңдауға арналған state (Default: Russian)
     const [genLanguage, setGenLanguage] = useState("Russian");
 
-    // 1. Generate функциясы (Батырма басқанда жұмыс істейді)
+    // 🔥 ЕҢ МАҢЫЗДЫ ӨЗГЕРІС ОСЫ ЖЕРДЕ 👇
+    // Бұл код: "Егер activeMaterial өзгерсе -> content-ті жаңарт" деп тұр
+    useEffect(() => {
+        if (activeMaterial) {
+            setContent(activeMaterial.content || "");
+            setError(null); // Қатені тазалау
+            setIsGenerating(false); // Жүктелуді тоқтату
+        }
+    }, [activeMaterial]);
+    // 👆 [activeMaterial] деген сөз, осы өзгерген сайын функция іске қосылады дегенді білдіреді
+
     const handleGenerate = async () => {
         if (!activeMaterial) return;
 
@@ -48,7 +59,6 @@ export function CoursePageClient({
         setError(null);
 
         try {
-            // Тілді екінші параметр қылып жібереміз
             const result = await generateLessonContent(activeMaterial.id, genLanguage);
 
             if (result.success && result.content) {
@@ -89,7 +99,6 @@ export function CoursePageClient({
                         </h1>
                     </div>
 
-                    {/* ТІЛ ТАҢДАУ (Егер контент жоқ болса немесе өте аз болса ғана шығады) */}
                     {(!content || content.length < 50) && (
                         <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-lg border">
                             <Globe className="h-4 w-4 text-muted-foreground" />
@@ -107,9 +116,7 @@ export function CoursePageClient({
                 </div>
             </div>
 
-            {/* Content Area */}
             <div className="prose prose-zinc dark:prose-invert max-w-none mb-8">
-                {/* Егер генерация жүріп жатса */}
                 {isGenerating ? (
                     <div className="space-y-4">
                         <div className="flex items-center gap-2 text-muted-foreground">
@@ -118,10 +125,7 @@ export function CoursePageClient({
                         </div>
                         <Skeleton className="h-8 w-3/4" />
                         <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-full" />
                         <Skeleton className="h-4 w-5/6" />
-                        <Skeleton className="h-8 w-2/3 mt-6" />
-                        <Skeleton className="h-4 w-full" />
                     </div>
                 ) : error ? (
                     <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
@@ -132,7 +136,6 @@ export function CoursePageClient({
                         </Button>
                     </div>
                 ) : (!content || content.length < 50) ? (
-                    // ЕГЕР КОНТЕНТ ЖОҚ БОЛСА -> GENERATE BUTTON
                     <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed rounded-lg bg-muted/30">
                         <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
                             <Sparkles className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -147,7 +150,6 @@ export function CoursePageClient({
                         </Button>
                     </div>
                 ) : (
-                    // ЕГЕР КОНТЕНТ БАР БОЛСА -> SHOW CONTENT
                     activeMaterial?.type === "video" ? (
                         <VideoPlayer url={content} />
                     ) : (
@@ -156,7 +158,6 @@ export function CoursePageClient({
                 )}
             </div>
 
-            {/* Footer Navigation (Тек контент бар кезде шығады) */}
             {content && content.length > 50 && (
                 <div className="flex justify-end pt-8 border-t border-border">
                     {nextMaterial ? (
