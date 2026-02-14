@@ -9,6 +9,7 @@ import { MarkdownText } from '@/components/markdown-text';
 import { VideoPlayer } from '@/components/video-player';
 import { generateLessonContent } from '@/app/actions/generate-lesson';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from "sonner";
 
 interface CoursePageClientProps {
     courseId: string;
@@ -20,9 +21,7 @@ interface CoursePageClientProps {
     } | null;
     moduleName: string;
     lessonNumber: number;
-    nextMaterial: {
-        id: string;
-    } | null;
+    nextMaterial: { id: string } | null;
 }
 
 export function CoursePageClient({
@@ -34,41 +33,38 @@ export function CoursePageClient({
 }: CoursePageClientProps) {
     const { t } = useLanguage();
 
-    // State
-    const [content, setContent] = useState(""); // Басында бос болады
+    const [content, setContent] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
-    // 1. Сабақ ауысқан сайын жұмыс істейтін логика
+    // САБАҚ АУЫСҚАНДА ЖҰМЫС ІСТЕЙТІН КОД
     useEffect(() => {
         if (!activeMaterial) return;
 
-        // Ескі контентті тазалаймыз (Қайталану болмас үшін)
+        // 1. Ескі сабақтың мәтінін лезде өшіреміз (Экран тазарады)
         setContent("");
-        setError(null);
+        setIsLoading(false);
 
-        // Егер базада дайын контент болса -> бірден көрсетеміз
+        // 2. Тексереміз: Базада дайын тұр ма?
         if (activeMaterial.content && activeMaterial.content.length > 50) {
+            // Иә, тұр! Соны бірден көрсетеміз.
+            // Запрос жібермейміз.
             setContent(activeMaterial.content);
-            setIsLoading(false);
         } else {
-            // Егер контент ЖОҚ болса -> АВТОМАТТЫ ТҮРДЕ генерация жібереміз (Батырмасыз)
-            generateAuto(activeMaterial.id);
+            // Жоқ, бос екен. Онда AI-ға жібереміз.
+            loadNewLesson(activeMaterial.id);
         }
+
     }, [activeMaterial?.id]); // ID өзгерген сайын іске қосылады
 
-    // Автоматты генерация функциясы
-    const generateAuto = async (id: string) => {
+    const loadNewLesson = async (id: string) => {
         setIsLoading(true);
         try {
             const result = await generateLessonContent(id);
             if (result.success && result.content) {
                 setContent(result.content);
-            } else {
-                setError("Сабақты жүктеу мүмкін болмады. Интернетті тексеріңіз.");
             }
-        } catch (err) {
-            setError("Қате орын алды.");
+        } catch (error) {
+            toast.error("Қате орын алды.");
         } finally {
             setIsLoading(false);
         }
@@ -84,55 +80,35 @@ export function CoursePageClient({
 
     return (
         <>
-            <div className="mb-8 border-b border-border pb-6">
-                <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span>{moduleName}</span>
-                        <span>•</span>
-                        <span>{t.readingMaterial}</span>
-                    </div>
-                    <h1 className="text-3xl font-bold text-foreground">
-                        {t.lesson} {lessonNumber}
-                    </h1>
+            <div className="mb-6 border-b border-border pb-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                    <span>{moduleName}</span>
+                    <span>•</span>
+                    <span>{t.readingMaterial}</span>
                 </div>
+                <h1 className="text-2xl font-bold text-foreground">
+                    {t.lesson} {lessonNumber}
+                </h1>
             </div>
 
             <div className="prose prose-zinc dark:prose-invert max-w-none mb-8 min-h-[400px]">
-                {/* 1. Егер жүктеліп жатса (AI жазып жатыр) */}
+                {/* Егер жүктеліп жатса немесе контент жоқ болса -> Скелетон */}
                 {isLoading ? (
                     <div className="space-y-6 py-10 animate-pulse">
                         <div className="flex items-center gap-3 text-blue-600 font-medium">
                             <Loader2 className="h-5 w-5 animate-spin" />
-                            <span>AI мұғалім сабақты дайындап жатыр... (Бұл 10-15 секунд алуы мүмкін)</span>
+                            <span>AI мұғалім сабақты жазуда...</span>
                         </div>
-                        {/* Скелетон (жүктелу әсері) */}
-                        <div className="space-y-3">
-                            <Skeleton className="h-8 w-3/4" />
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-5/6" />
-                        </div>
-                        <div className="space-y-3 pt-4">
-                            <Skeleton className="h-6 w-1/2" />
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-4/5" />
-                        </div>
-                    </div>
-                ) : error ? (
-                    // 2. Егер қате шықса
-                    <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-4 text-red-600">
-                        <p>{error}</p>
-                        <Button variant="outline" onClick={() => generateAuto(activeMaterial.id)} className="mt-2">
-                            Қайта көру
-                        </Button>
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-5/6" />
+                        <Skeleton className="h-32 w-full rounded-lg" />
                     </div>
                 ) : (
-                    // 3. Дайын контент
+                    // Дайын контент болса -> Көрсетеміз
                     <MarkdownText content={content} />
                 )}
             </div>
 
-            {/* Төменгі навигация (тек контент дайын болғанда шығады) */}
             {!isLoading && content.length > 50 && (
                 <div className="flex justify-end pt-8 border-t border-border">
                     {nextMaterial ? (

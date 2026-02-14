@@ -8,13 +8,14 @@ import { revalidatePath } from "next/cache";
 
 const apiKey = process.env.GEMINI_API_KEY;
 
+// 👇 "export" сөзі тұрғанына мән беріңіз!
 export async function generateCourse(topic: string, language: string) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
   if (!apiKey) throw new Error("API Key not found");
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   console.log(`🤖 Creating course: "${topic}" in language: "${language}"`);
 
@@ -61,14 +62,13 @@ export async function generateCourse(topic: string, language: string) {
       language: language,
     }).returning();
 
-    // 2. Модульдер мен сабақтарды сақтау (ORDER ҚОСЫЛДЫ)
-    // Біз for емес, map қолданамыз, себебі index (i) керек
+    // 2. Модульдер мен сабақтарды сақтау (Ретімен)
     await Promise.all(courseData.modules.map(async (modData: any, index: number) => {
 
       const [newModule] = await db.insert(modules).values({
         courseId: newCourse.id,
         title: modData.title,
-        order: index + 1, // 👈 ТҮЗЕТУ: Рет санын қостық (1, 2, 3...)
+        order: index + 1, // Модуль реті
       }).returning();
 
       if (modData.lessons) {
@@ -78,7 +78,7 @@ export async function generateCourse(topic: string, language: string) {
             title: lesson.title,
             type: "text",
             content: "",
-            order: lessonIndex + 1, // 👈 ТҮЗЕТУ: Сабақтың рет саны
+            order: lessonIndex + 1, // Сабақ реті
           });
         }));
       }
