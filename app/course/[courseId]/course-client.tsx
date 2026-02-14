@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, PlayCircle, CheckCircle, Loader2, Sparkles } from 'lucide-react';
+import { ChevronRight, PlayCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
 import { MarkdownText } from '@/components/markdown-text';
 import { VideoPlayer } from '@/components/video-player';
@@ -33,112 +33,107 @@ export function CoursePageClient({
     nextMaterial
 }: CoursePageClientProps) {
     const { t } = useLanguage();
-    const [content, setContent] = useState(activeMaterial?.content || "");
-    const [isGenerating, setIsGenerating] = useState(false);
+
+    // State
+    const [content, setContent] = useState(""); // Басында бос болады
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // ActiveMaterial ауысқанда контентті жаңарту
+    // 1. Сабақ ауысқан сайын жұмыс істейтін логика
     useEffect(() => {
-        if (activeMaterial) {
-            setContent(activeMaterial.content || "");
-            setError(null);
-            setIsGenerating(false);
-        }
-    }, [activeMaterial]);
-
-    const handleGenerate = async () => {
         if (!activeMaterial) return;
 
-        setIsGenerating(true);
+        // Ескі контентті тазалаймыз (Қайталану болмас үшін)
+        setContent("");
         setError(null);
 
-        try {
-            // 👇 ТҮЗЕТУ: Тек ID жібереміз. Тіл базадан алынады.
-            const result = await generateLessonContent(activeMaterial.id);
+        // Егер базада дайын контент болса -> бірден көрсетеміз
+        if (activeMaterial.content && activeMaterial.content.length > 50) {
+            setContent(activeMaterial.content);
+            setIsLoading(false);
+        } else {
+            // Егер контент ЖОҚ болса -> АВТОМАТТЫ ТҮРДЕ генерация жібереміз (Батырмасыз)
+            generateAuto(activeMaterial.id);
+        }
+    }, [activeMaterial?.id]); // ID өзгерген сайын іске қосылады
 
+    // Автоматты генерация функциясы
+    const generateAuto = async (id: string) => {
+        setIsLoading(true);
+        try {
+            const result = await generateLessonContent(id);
             if (result.success && result.content) {
                 setContent(result.content);
             } else {
-                setError(result.error || "Failed to generate lesson content");
+                setError("Сабақты жүктеу мүмкін болмады. Интернетті тексеріңіз.");
             }
-        } catch (err: any) {
-            setError(err.message || "An error occurred");
+        } catch (err) {
+            setError("Қате орын алды.");
         } finally {
-            setIsGenerating(false);
+            setIsLoading(false);
         }
     };
 
     if (!activeMaterial) {
         return (
-            <div className="flex h-full flex-col items-center justify-center text-muted-foreground">
-                <div className="rounded-full bg-muted p-4 mb-4">
-                    <PlayCircle className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <p className="text-lg font-medium">{t.selectLessonToStart}</p>
+            <div className="flex h-full items-center justify-center text-muted-foreground">
+                <p>{t.selectLessonToStart}</p>
             </div>
         );
     }
 
     return (
         <>
-            <div className="mb-8 border-b border-border pb-8">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                            <span>{moduleName}</span>
-                            <span>•</span>
-                            <span>{activeMaterial.type === "video" ? t.videoLesson : t.readingMaterial}</span>
-                        </div>
-                        <h1 className="text-3xl font-bold text-foreground">
-                            {t.lesson} {lessonNumber}
-                        </h1>
+            <div className="mb-8 border-b border-border pb-6">
+                <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span>{moduleName}</span>
+                        <span>•</span>
+                        <span>{t.readingMaterial}</span>
                     </div>
+                    <h1 className="text-3xl font-bold text-foreground">
+                        {t.lesson} {lessonNumber}
+                    </h1>
                 </div>
             </div>
 
-            <div className="prose prose-zinc dark:prose-invert max-w-none mb-8">
-                {isGenerating ? (
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-muted-foreground">
+            <div className="prose prose-zinc dark:prose-invert max-w-none mb-8 min-h-[400px]">
+                {/* 1. Егер жүктеліп жатса (AI жазып жатыр) */}
+                {isLoading ? (
+                    <div className="space-y-6 py-10 animate-pulse">
+                        <div className="flex items-center gap-3 text-blue-600 font-medium">
                             <Loader2 className="h-5 w-5 animate-spin" />
-                            <span>AI мұғалім сабақты жазуда...</span>
+                            <span>AI мұғалім сабақты дайындап жатыр... (Бұл 10-15 секунд алуы мүмкін)</span>
                         </div>
-                        <Skeleton className="h-8 w-3/4" />
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-5/6" />
+                        {/* Скелетон (жүктелу әсері) */}
+                        <div className="space-y-3">
+                            <Skeleton className="h-8 w-3/4" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-5/6" />
+                        </div>
+                        <div className="space-y-3 pt-4">
+                            <Skeleton className="h-6 w-1/2" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-4/5" />
+                        </div>
                     </div>
                 ) : error ? (
-                    <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
-                        <p className="text-destructive font-medium">{t.errorLoading}</p>
-                        <p className="text-sm text-muted-foreground mt-1">{error}</p>
-                        <Button variant="outline" size="sm" onClick={handleGenerate} className="mt-4">
-                            Try Again
-                        </Button>
-                    </div>
-                ) : (!content || content.length < 50) ? (
-                    <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed rounded-lg bg-muted/30">
-                        <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
-                            <Sparkles className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <h3 className="text-lg font-semibold mb-2">Сабақ дайын емес пе?</h3>
-                        <p className="text-muted-foreground mb-6 text-center max-w-md">
-                            Түймені басыңыз, AI сізге сабақты сол тілде түсіндіріп береді.
-                        </p>
-                        <Button onClick={handleGenerate} size="lg" className="gap-2 bg-blue-600 hover:bg-blue-700 text-white">
-                            <Sparkles className="h-4 w-4" />
-                            Сабақты бастау
+                    // 2. Егер қате шықса
+                    <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-4 text-red-600">
+                        <p>{error}</p>
+                        <Button variant="outline" onClick={() => generateAuto(activeMaterial.id)} className="mt-2">
+                            Қайта көру
                         </Button>
                     </div>
                 ) : (
-                    activeMaterial?.type === "video" ? (
-                        <VideoPlayer url={content} />
-                    ) : (
-                        <MarkdownText content={content} />
-                    )
+                    // 3. Дайын контент
+                    <MarkdownText content={content} />
                 )}
             </div>
 
-            {content && content.length > 50 && (
+            {/* Төменгі навигация (тек контент дайын болғанда шығады) */}
+            {!isLoading && content.length > 50 && (
                 <div className="flex justify-end pt-8 border-t border-border">
                     {nextMaterial ? (
                         <Link href={`/course/${courseId}?materialId=${nextMaterial.id}`}>

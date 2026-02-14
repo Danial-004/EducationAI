@@ -37,9 +37,11 @@ export default async function CoursePage({ params, searchParams }: PageProps) {
         where: eq(courses.id, courseId),
         with: {
             modules: {
-                orderBy: [asc(modules.order)],
+                orderBy: asc(modules.order), // 👈 МОДУЛЬДЕРДІ РЕТТЕУ (1, 2, 3...)
                 with: {
-                    materials: true,
+                    materials: {
+                        orderBy: asc(materials.order), // 👈 САБАҚТАРДЫ РЕТТЕУ (1.1, 1.2...)
+                    },
                 },
             },
         },
