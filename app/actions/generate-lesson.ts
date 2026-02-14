@@ -31,7 +31,7 @@ export async function generateLessonContent(materialId: string) {
         // Тек база БОС болғанда ғана төменге түсеміз
         const apiKey = process.env.GEMINI_API_KEY;
         const genAI = new GoogleGenerativeAI(apiKey!);
-        const model = genAI.getGenerativeModel({ model: "gemini-3.0-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const targetLanguage = lesson.module.course.language || "Russian";
 

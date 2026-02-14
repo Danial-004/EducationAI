@@ -16,7 +16,7 @@ export async function generateQuiz(lessonId: string, courseId: string) {
     // 1. Setup AI
     if (!EMERGENCY_API_KEY) throw new Error("API Key missing");
     const genAI = new GoogleGenerativeAI(EMERGENCY_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-3.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     console.log(`🧠 Generating Quiz for Lesson ID: ${lessonId}`);
 

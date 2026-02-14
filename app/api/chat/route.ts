@@ -19,7 +19,7 @@ export async function POST(req: Request) {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
         // Strictly use gemini-2.5-flash as requested by user
-        const modelToUse = "gemini-3.0-flash";
+        const modelToUse = "gemini-2.5-flash";
         console.log(`Using model: ${modelToUse}`);
 
         const model = genAI.getGenerativeModel({ model: modelToUse });
