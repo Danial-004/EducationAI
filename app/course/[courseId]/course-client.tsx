@@ -1,10 +1,9 @@
 'use client';
 
-// 1. useEffect импорттауды ұмытпаңыз!
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, PlayCircle, CheckCircle, Loader2, Globe, Sparkles } from 'lucide-react';
+import { ChevronRight, PlayCircle, CheckCircle, Loader2, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
 import { MarkdownText } from '@/components/markdown-text';
 import { VideoPlayer } from '@/components/video-player';
@@ -34,23 +33,18 @@ export function CoursePageClient({
     nextMaterial
 }: CoursePageClientProps) {
     const { t } = useLanguage();
-
-    // State
     const [content, setContent] = useState(activeMaterial?.content || "");
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [genLanguage, setGenLanguage] = useState("Russian");
 
-    // 🔥 ЕҢ МАҢЫЗДЫ ӨЗГЕРІС ОСЫ ЖЕРДЕ 👇
-    // Бұл код: "Егер activeMaterial өзгерсе -> content-ті жаңарт" деп тұр
+    // ActiveMaterial ауысқанда контентті жаңарту
     useEffect(() => {
         if (activeMaterial) {
             setContent(activeMaterial.content || "");
-            setError(null); // Қатені тазалау
-            setIsGenerating(false); // Жүктелуді тоқтату
+            setError(null);
+            setIsGenerating(false);
         }
     }, [activeMaterial]);
-    // 👆 [activeMaterial] деген сөз, осы өзгерген сайын функция іске қосылады дегенді білдіреді
 
     const handleGenerate = async () => {
         if (!activeMaterial) return;
@@ -59,7 +53,8 @@ export function CoursePageClient({
         setError(null);
 
         try {
-            const result = await generateLessonContent(activeMaterial.id, genLanguage);
+            // 👇 ТҮЗЕТУ: Тек ID жібереміз. Тіл базадан алынады.
+            const result = await generateLessonContent(activeMaterial.id);
 
             if (result.success && result.content) {
                 setContent(result.content);
@@ -98,21 +93,6 @@ export function CoursePageClient({
                             {t.lesson} {lessonNumber}
                         </h1>
                     </div>
-
-                    {(!content || content.length < 50) && (
-                        <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-lg border">
-                            <Globe className="h-4 w-4 text-muted-foreground" />
-                            <select
-                                className="bg-transparent text-sm font-medium focus:outline-none cursor-pointer"
-                                value={genLanguage}
-                                onChange={(e) => setGenLanguage(e.target.value)}
-                            >
-                                <option value="Kazakh">🇰🇿 Қазақша</option>
-                                <option value="Russian">🇷🇺 Русский</option>
-                                <option value="English">🇺🇸 English</option>
-                            </select>
-                        </div>
-                    )}
                 </div>
             </div>
 
@@ -121,7 +101,7 @@ export function CoursePageClient({
                     <div className="space-y-4">
                         <div className="flex items-center gap-2 text-muted-foreground">
                             <Loader2 className="h-5 w-5 animate-spin" />
-                            <span>Creating lesson in {genLanguage}...</span>
+                            <span>AI мұғалім сабақты жазуда...</span>
                         </div>
                         <Skeleton className="h-8 w-3/4" />
                         <Skeleton className="h-4 w-full" />
@@ -140,13 +120,13 @@ export function CoursePageClient({
                         <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
                             <Sparkles className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                         </div>
-                        <h3 className="text-lg font-semibold mb-2">Ready to Learn?</h3>
+                        <h3 className="text-lg font-semibold mb-2">Сабақ дайын емес пе?</h3>
                         <p className="text-muted-foreground mb-6 text-center max-w-md">
-                            Select your preferred language above and let AI create a personalized lesson for you.
+                            Түймені басыңыз, AI сізге сабақты сол тілде түсіндіріп береді.
                         </p>
                         <Button onClick={handleGenerate} size="lg" className="gap-2 bg-blue-600 hover:bg-blue-700 text-white">
                             <Sparkles className="h-4 w-4" />
-                            Generate Lesson ({genLanguage})
+                            Сабақты бастау
                         </Button>
                     </div>
                 ) : (

@@ -88,6 +88,7 @@ export const courses = pgTable('courses', {
     title: text('title').notNull(),
     description: text('description'),
     published: boolean('published').default(false).notNull(),
+    language: text("language").default("Russian"),
     createdAt: timestamp('createdAt', { mode: 'date' }).defaultNow().notNull(),
     updatedAt: timestamp('updatedAt', { mode: 'date' }).defaultNow().notNull(),
 });
