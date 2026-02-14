@@ -1,200 +1,76 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-import { useRouter } from "next/navigation";
-import { Button } from '@/components/ui/button';
-import { ChevronRight, CheckCircle, Loader2, RotateCcw, Sparkles } from 'lucide-react';
-import { useLanguage } from '@/contexts/language-context';
-import { MarkdownText } from '@/components/markdown-text';
-import { generateLessonContent } from '@/app/actions/generate-lesson';
-import { Skeleton } from '@/components/ui/skeleton';
-import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { useRouter, usePathname } from "next/navigation";
+import { Lock, PlayCircle, CheckCircle } from "lucide-react";
 
-interface CoursePageClientProps {
-    courseId: string;
-    activeMaterial: {
-        id: string;
-        type: string;
-        content: string;
-        moduleId: string;
-    } | null;
-    moduleName: string;
-    lessonNumber: number;
-    nextMaterial: { id: string } | null;
+// Типтер (қате шықпас үшін any қолданамыз, бірақ дұрысы нақты тип болуы керек)
+interface CourseSidebarClientProps {
+    course: any;
+    progressCount: number;
 }
 
-export function CoursePageClient({
-    courseId,
-    activeMaterial,
-    moduleName,
-    lessonNumber,
-    nextMaterial
-}: CoursePageClientProps) {
-    const { t } = useLanguage();
+// 👇 ЕҢ МАҢЫЗДЫСЫ: "export function" деп жазылуы керек (default емес!)
+export function CourseSidebarClient({
+    course,
+    progressCount,
+}: CourseSidebarClientProps) {
     const router = useRouter();
-
-    // State
-    const [content, setContent] = useState(activeMaterial?.content || "");
-    // Егер контент жоқ болса -> Loading күйіне қоямыз
-    const [isLoading, setIsLoading] = useState(!activeMaterial?.content || activeMaterial.content.length < 50);
-
-    // 🔒 ҚҰЛЫП (Double-request prevention)
-    const isRequestPending = useRef(false);
-
-    useEffect(() => {
-        if (!activeMaterial) return;
-
-        // 1. Егер базада дайын мәтін болса
-        if (activeMaterial.content && activeMaterial.content.length > 50) {
-            setContent(activeMaterial.content);
-            setIsLoading(false);
-        } else {
-            // 2. Егер база бос болса -> Генерация жасаймыз
-            // Бірақ алдымен ҚҰЛЫПТЫ тексереміз
-            if (!isRequestPending.current) {
-                setContent("");
-                setIsLoading(true);
-                loadNewLesson(activeMaterial.id);
-            }
-        }
-    }, [activeMaterial?.id]); // ID өзгергенде іске қосылады
-
-    const loadNewLesson = async (id: string) => {
-        // Құлыптаймыз
-        isRequestPending.current = true;
-
-        try {
-            const result = await generateLessonContent(id);
-            if (result.success && result.content) {
-                setContent(result.content);
-                router.refresh();
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error("Қате орын алды. Қайта көріңіз.");
-        } finally {
-            setIsLoading(false);
-            // Құлыпты ашамыз (бірақ келесі useEffect-ке дейін керек емес)
-            isRequestPending.current = false;
-        }
-    };
-
-    // Қате болған сабақты қолмен түзету функциясы
-    const forceRegenerate = async () => {
-        if (!activeMaterial) return;
-
-        // Экранды тазалаймыз
-        setContent("");
-        setIsLoading(true);
-        isRequestPending.current = true;
-
-        try {
-            // Серверге "ескіні елеме, жаңадан жаз" деп сұраныс жібереміз
-            // (generateLessonContent функциясы update жасайтындықтан, 
-            // ескі мәтін автоматты түрде өшеді)
-            await loadNewLesson(activeMaterial.id);
-            toast.success("Сабақ қайта жазылды!");
-        } catch (e) {
-            toast.error("Қате шықты");
-        }
-    };
-
-    if (!activeMaterial) {
-        return (
-            <div className="flex h-full items-center justify-center text-muted-foreground">
-                <p>{t.selectLessonToStart}</p>
-            </div>
-        );
-    }
+    const pathname = usePathname();
 
     return (
-        <>
-            <div className="mb-6 border-b border-border pb-4 flex justify-between items-start">
-                <div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                        <span>{moduleName}</span>
-                        <span>•</span>
-                        <span>{t.readingMaterial}</span>
+        <div className="h-full border-r flex flex-col overflow-y-auto shadow-sm bg-white dark:bg-zinc-900">
+            <div className="p-6 flex flex-col border-b">
+                <h1 className="font-semibold text-md">{course.title}</h1>
+                {/* Прогресс бар */}
+                <div className="mt-4">
+                    <div className="h-2 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-emerald-500 transition-all duration-300"
+                            style={{ width: `${progressCount}%` }}
+                        />
                     </div>
-                    <h1 className="text-2xl font-bold text-foreground">
-                        {t.lesson} {lessonNumber}
-                    </h1>
+                    <p className="text-xs text-muted-foreground mt-2 font-medium">
+                        {Math.round(progressCount)}% аяқталды
+                    </p>
                 </div>
-
-                {/* Егер мәтін бұзылған болса (екі рет жазылса), осы батырманы басып түзеуге болады */}
-                {!isLoading && content.length > 50 && (
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={forceRegenerate}
-                        title="Сабақты қайта жазу (Егер қате болса)"
-                        className="text-muted-foreground hover:text-primary"
-                    >
-                        <RotateCcw className="h-4 w-4" />
-                    </Button>
-                )}
             </div>
 
-            <div className="prose prose-zinc dark:prose-invert max-w-none mb-8 min-h-[400px]">
-                {/* 1. ЖҮКТЕЛУ КЕЗІ (SKELETON) */}
-                {isLoading ? (
-                    <div className="space-y-6 py-6 animate-pulse">
-                        <div className="flex items-center gap-3 text-blue-600 font-medium">
-                            <Loader2 className="h-5 w-5 animate-spin" />
-                            <span>AI мұғалім сабақты жазуда... (Күте тұрыңыз)</span>
+            <div className="flex flex-col w-full">
+                {course.modules?.map((module: any) => (
+                    <div key={module.id} className="flex flex-col">
+                        <div className="px-4 py-3 bg-slate-50 dark:bg-zinc-800/50 font-medium text-sm text-slate-600 dark:text-slate-300 border-y">
+                            {module.title}
                         </div>
-                        <div className="space-y-2">
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-[90%]" />
-                            <Skeleton className="h-4 w-[95%]" />
-                        </div>
-                        <Skeleton className="h-32 w-full rounded-lg mt-4" />
-                        <div className="space-y-2 mt-4">
-                            <Skeleton className="h-4 w-[92%]" />
-                            <Skeleton className="h-4 w-[88%]" />
-                            <Skeleton className="h-4 w-full" />
-                        </div>
-                    </div>
-                ) : content && content.length > 50 ? (
-                    // 2. ДАЙЫН МӘТІН
-                    <MarkdownText content={content} />
-                ) : (
-                    // 3. ЕГЕР ҚАТЕ БОЛЫП, БОС ҚАЛСА
-                    <div className="flex flex-col items-center justify-center py-10 border-2 border-dashed rounded-lg bg-muted/30">
-                        <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                            <Sparkles className="h-6 w-6 text-blue-600" />
-                        </div>
-                        <p className="text-muted-foreground mb-4 text-center">
-                            Сабақ мазмұны жүктелмеді.
-                        </p>
-                        <Button onClick={() => loadNewLesson(activeMaterial.id)} className="bg-blue-600 text-white">
-                            Қайта көру
-                        </Button>
-                    </div>
-                )}
-            </div>
+                        {module.materials?.map((lesson: any) => {
+                            const isActive = pathname?.includes(lesson.id);
+                            // Логика: Егер алдыңғы сабақ бітпесе, келесісі жабық болуы мүмкін (әзірге ашық)
+                            const isLocked = false;
 
-            {/* Навигация */}
-            {!isLoading && content.length > 50 && (
-                <div className="flex justify-end pt-8 border-t border-border">
-                    {nextMaterial ? (
-                        <Link href={`/course/${courseId}?materialId=${nextMaterial.id}`}>
-                            <Button size="lg" className="gap-2">
-                                {t.nextLesson}
-                                <ChevronRight className="h-4 w-4" />
-                            </Button>
-                        </Link>
-                    ) : (
-                        <Link href={`/course/${courseId}/quiz`}>
-                            <Button size="lg" className="gap-2 bg-green-600 hover:bg-green-700 text-white">
-                                {t.takeQuiz}
-                                <CheckCircle className="h-4 w-4" />
-                            </Button>
-                        </Link>
-                    )}
-                </div>
-            )}
-        </>
+                            return (
+                                <button
+                                    key={lesson.id}
+                                    onClick={() => router.push(`/course/${course.id}?materialId=${lesson.id}`)}
+                                    className={cn(
+                                        "flex items-center gap-x-2 text-slate-500 text-sm font-[500] pl-6 transition-all hover:text-slate-600 hover:bg-slate-300/20 py-4",
+                                        isActive && "text-emerald-700 bg-emerald-100/20 hover:bg-emerald-100/20 hover:text-emerald-700 dark:text-emerald-400 dark:bg-emerald-900/10 border-r-2 border-emerald-500",
+                                        isLocked && "opacity-50 pointer-events-none"
+                                    )}
+                                >
+                                    {isLocked ? (
+                                        <Lock className="h-4 w-4" />
+                                    ) : isActive ? (
+                                        <PlayCircle className="h-4 w-4 text-emerald-600" />
+                                    ) : (
+                                        <CheckCircle className="h-4 w-4 text-slate-400" />
+                                    )}
+                                    <span className="line-clamp-1 text-left">{lesson.title}</span>
+                                </button>
+                            )
+                        })}
+                    </div>
+                ))}
+            </div>
+        </div>
     );
 }
