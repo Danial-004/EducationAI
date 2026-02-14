@@ -27,8 +27,8 @@ export async function generateCourse(topic: string, language: string) {
     The ENTIRE Output MUST BE IN **${language}** language.
     
     Structure:
-    - 4-6 Modules.
-    - 2-4 Lessons per Module.
+    - 15-20 Modules.
+    - 5-10 Lessons per Module.
 
     OUTPUT JSON FORMAT ONLY:
     {
