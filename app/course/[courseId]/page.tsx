@@ -1,31 +1,38 @@
 import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { courses, modules, materials } from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Menu } from "lucide-react";
 
-// Импорттар (осы файлдар бар екеніне көз жеткізіңіз)
+// Импорттар
 import { CourseSidebarClient } from "./course-sidebar-client";
 import { CoursePageClient } from "./course-client";
+import { AiTutor } from "@/components/ai-tutor";
+import {
+    Sheet,
+    SheetContent,
+    SheetTrigger,
+    SheetTitle,
+} from "@/components/ui/sheet";
 
-// 👇 Next.js 15 үшін типтерді дұрыстау (Promise қылу керек)
+// Next.js 15 типтері
 interface PageProps {
     params: Promise<{ courseId: string }>;
     searchParams: Promise<{ materialId?: string }>;
 }
 
 export default async function CoursePage(props: PageProps) {
-    // 1. Параметрлерді "күтіп" алу (await)
+    // 1. Параметрлерді күтіп аламыз (Next.js 15 fix)
     const params = await props.params;
     const searchParams = await props.searchParams;
 
     const session = await auth();
+    if (!session?.user) return redirect("/auth");
 
-    if (!session?.user) {
-        return redirect("/auth");
-    }
-
-    // 2. Курсты базадан алу
+    // 2. Курсты алу
     const course = await db.query.courses.findFirst({
         where: eq(courses.id, params.courseId),
         with: {
@@ -40,66 +47,105 @@ export default async function CoursePage(props: PageProps) {
         },
     });
 
-    if (!course) {
-        return redirect("/dashboard");
+    if (!course) return notFound();
+
+    // 3. Активті сабақты табу логикасы
+    let activeMaterial = null;
+    const allMaterials = course.modules.flatMap((m) => m.materials);
+
+    if (searchParams.materialId) {
+        activeMaterial = allMaterials.find((m) => m.id === searchParams.materialId);
+    }
+    // Егер URL бос болса -> бірінші сабақты ашамыз
+    if (!activeMaterial && allMaterials.length > 0) {
+        activeMaterial = allMaterials[0];
     }
 
-    // 3. Қазіргі сабақты (Active Material) табу
-    let activeMaterial = null;
+    // Келесі сабақты табу
+    let nextMaterial = null;
     let moduleName = "";
     let lessonNumber = 1;
 
-    // Егер URL-да ?materialId=... болса
-    if (searchParams.materialId) {
-        for (const module of course.modules) {
-            const found = module.materials.find((m) => m.id === searchParams.materialId);
-            if (found) {
-                activeMaterial = found;
-                moduleName = module.title;
-                // Сабақтың реттік нөмірін табу
-                const allMaterialsInModule = module.materials;
-                lessonNumber = allMaterialsInModule.indexOf(found) + 1;
-                break;
-            }
-        }
-    }
-    // Егер URL бос болса (курсты енді ашса), бірінші сабақты береміз
-    else if (course.modules.length > 0 && course.modules[0].materials.length > 0) {
-        activeMaterial = course.modules[0].materials[0];
-        moduleName = course.modules[0].title;
-        lessonNumber = 1;
-    }
-
-    // 4. "Келесі сабақ" батырмасы үшін логика
-    let nextMaterial = null;
-
-    // Барлық сабақтарды бір тізімге жинау (flat map)
-    const allMaterials = course.modules.flatMap((m) => m.materials);
-
     if (activeMaterial) {
         const currentIndex = allMaterials.findIndex((m) => m.id === activeMaterial?.id);
-        // Егер тізімнің соңы болмаса, келесі сабақты аламыз
         if (currentIndex !== -1 && currentIndex < allMaterials.length - 1) {
             nextMaterial = allMaterials[currentIndex + 1];
         }
+
+        // Модуль аты мен сабақ нөмірін табу
+        const activeModule = course.modules.find(m => m.id === activeMaterial?.moduleId);
+        moduleName = activeModule?.title || "";
+        lessonNumber = (activeModule?.materials.findIndex(m => m.id === activeMaterial?.id) ?? 0) + 1;
     }
 
     return (
-        <div className="flex h-full">
-            {/* СОЛ ЖАҚ МЕНЮ (SIDEBAR) */}
-            <div className="hidden md:flex h-full w-80 flex-col fixed inset-y-0 z-50 border-r bg-background">
-                <CourseSidebarClient
-                    course={course}
-                    progressCount={0} // Әзірге 0, кейін қосамыз
-                />
+        <div className="flex h-screen flex-col md:flex-row overflow-hidden">
+
+            {/* -------------------------------------------------- */}
+            {/* 1. DESKTOP SIDEBAR (Тек компьютерде көрінеді)      */}
+            {/* -------------------------------------------------- */}
+            <div className="hidden md:flex w-80 flex-col border-r bg-background h-full fixed inset-y-0 z-50">
+                <div className="p-4 border-b flex items-center gap-2 h-16">
+                    <Link href="/dashboard">
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <ArrowLeft className="h-4 w-4" />
+                        </Button>
+                    </Link>
+                    <span className="font-semibold truncate" title={course.title}>
+                        {course.title}
+                    </span>
+                </div>
+                <div className="flex-1 overflow-y-auto">
+                    <CourseSidebarClient
+                        course={course}
+                        progressCount={0}
+                    />
+                </div>
             </div>
 
-            {/* ОҢ ЖАҚ НЕГІЗГІ БЕТ */}
-            <main className="md:pl-80 h-full w-full overflow-y-auto">
-                <div className="p-6 max-w-4xl mx-auto">
+            {/* -------------------------------------------------- */}
+            {/* 2. MOBILE HEADER (Тек телефонда көрінеді)          */}
+            {/* -------------------------------------------------- */}
+            <div className="md:hidden flex items-center justify-between p-4 border-b bg-background h-16 sticky top-0 z-40">
+                <div className="flex items-center gap-2 overflow-hidden">
+                    <Link href="/dashboard">
+                        <ArrowLeft className="h-5 w-5 text-muted-foreground" />
+                    </Link>
+                    <span className="font-semibold truncate max-w-[200px]">{course.title}</span>
+                </div>
+
+                {/* БУРГЕР МЕНЮ */}
+                <Sheet>
+                    <SheetTrigger asChild>
+                        <Button variant="outline" size="icon">
+                            <Menu className="h-5 w-5" />
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="w-80 p-0">
+                        <div className="p-4 border-b h-16 flex items-center">
+                            <SheetTitle className="font-semibold truncate">{course.title}</SheetTitle>
+                        </div>
+                        <div className="h-[calc(100vh-4rem)] overflow-y-auto">
+                            <CourseSidebarClient
+                                course={course}
+                                progressCount={0}
+                            />
+                        </div>
+                    </SheetContent>
+                </Sheet>
+            </div>
+
+            {/* -------------------------------------------------- */}
+            {/* 3. MAIN CONTENT (Негізгі экран)                    */}
+            {/* -------------------------------------------------- */}
+            <main className="flex-1 md:pl-80 h-full overflow-y-auto bg-slate-50 dark:bg-zinc-900/50">
+                {/* AI Tutor Floating Button */}
+                <AiTutor courseTitle={course.title} />
+
+                <div className="p-6 max-w-4xl mx-auto pb-20">
                     <CoursePageClient
                         courseId={course.id}
-                        // activeMaterial null болса да қате шықпас үшін тексеру
+                        // activeMaterial-ды дұрыстап жібереміз
                         activeMaterial={activeMaterial ? {
                             id: activeMaterial.id,
                             type: activeMaterial.type,
