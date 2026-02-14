@@ -7,13 +7,13 @@ import { eq } from "drizzle-orm";
 
 export async function generateLessonContent(materialId: string) {
     try {
-        // 1. Сабақ инфосын аламыз + КУРСТЫҢ ТІЛІН аламыз
+        // 1. Сабақты табамыз
         const lesson = await db.query.materials.findFirst({
             where: eq(materials.id, materialId),
             with: {
                 module: {
                     with: {
-                        course: true, // language осында жатыр
+                        course: true,
                     },
                 },
             },
@@ -21,16 +21,18 @@ export async function generateLessonContent(materialId: string) {
 
         if (!lesson) throw new Error("Lesson not found");
 
-        // Егер контент бар болса, қайтарамыз (қайта жазбаймыз)
+        // 🔥 ҚАТАҢ ТЕКСЕРУ: 
+        // Егер базада 50 әріптен көп мәтін болса -> СОНЫ ҚАЙТАРАМЫЗ.
+        // AI-ға запрос жібермейміз. Ешқандай қайталану болмайды.
         if (lesson.content && lesson.content.length > 50) {
             return { success: true, content: lesson.content };
         }
 
+        // Тек база БОС болғанда ғана төменге түсеміз
         const apiKey = process.env.GEMINI_API_KEY;
         const genAI = new GoogleGenerativeAI(apiKey!);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        // 👇 МІНЕ, БАЗАДАҒЫ ТІЛДІ АЛАМЫЗ
         const targetLanguage = lesson.module.course.language || "Russian";
 
         const prompt = `
@@ -46,6 +48,8 @@ export async function generateLessonContent(materialId: string) {
             2. Core Theory
             3. Examples
             4. Summary
+            
+            
 
             Format: Markdown. 
             Length: 600-800 words.
@@ -54,7 +58,7 @@ export async function generateLessonContent(materialId: string) {
         const result = await model.generateContent(prompt);
         const generatedContent = result.response.text();
 
-        // Сақтаймыз
+        // Базаға ЖАҢАРТЫП жазамыз (Append емес, Replace)
         await db
             .update(materials)
             .set({ content: generatedContent })
@@ -63,7 +67,7 @@ export async function generateLessonContent(materialId: string) {
         return { success: true, content: generatedContent };
 
     } catch (error: any) {
-        console.error("Lesson Gen Error:", error);
+        console.error("Error:", error);
         return { success: false, error: error.message };
     }
 }

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, PlayCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { ChevronRight, CheckCircle, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
 import { MarkdownText } from '@/components/markdown-text';
 import { VideoPlayer } from '@/components/video-player';
@@ -36,25 +36,24 @@ export function CoursePageClient({
     const [content, setContent] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
-    // САБАҚ АУЫСҚАНДА ЖҰМЫС ІСТЕЙТІН КОД
+    // САБАҚ АУЫСҚАНДА
     useEffect(() => {
         if (!activeMaterial) return;
 
-        // 1. Ескі сабақтың мәтінін лезде өшіреміз (Экран тазарады)
+        // 1. ЭКРАНДЫ ТАЗАЛАЙМЫЗ (Ескі мәтін қалмауы үшін)
         setContent("");
         setIsLoading(false);
 
-        // 2. Тексереміз: Базада дайын тұр ма?
+        // 2. БАЗАДА БАР МА?
         if (activeMaterial.content && activeMaterial.content.length > 50) {
-            // Иә, тұр! Соны бірден көрсетеміз.
-            // Запрос жібермейміз.
+            // Бар болса, серверден қайта сұрамаймыз, бірден көрсетеміз
             setContent(activeMaterial.content);
         } else {
-            // Жоқ, бос екен. Онда AI-ға жібереміз.
+            // Жоқ болса, генерация жасаймыз
             loadNewLesson(activeMaterial.id);
         }
 
-    }, [activeMaterial?.id]); // ID өзгерген сайын іске қосылады
+    }, [activeMaterial?.id]);
 
     const loadNewLesson = async (id: string) => {
         setIsLoading(true);
@@ -92,19 +91,17 @@ export function CoursePageClient({
             </div>
 
             <div className="prose prose-zinc dark:prose-invert max-w-none mb-8 min-h-[400px]">
-                {/* Егер жүктеліп жатса немесе контент жоқ болса -> Скелетон */}
                 {isLoading ? (
                     <div className="space-y-6 py-10 animate-pulse">
                         <div className="flex items-center gap-3 text-blue-600 font-medium">
                             <Loader2 className="h-5 w-5 animate-spin" />
-                            <span>AI мұғалім сабақты жазуда...</span>
+                            <span>AI мұғалім сабақты жазуда... (Күте тұрыңыз)</span>
                         </div>
                         <Skeleton className="h-4 w-full" />
                         <Skeleton className="h-4 w-5/6" />
                         <Skeleton className="h-32 w-full rounded-lg" />
                     </div>
                 ) : (
-                    // Дайын контент болса -> Көрсетеміз
                     <MarkdownText content={content} />
                 )}
             </div>
