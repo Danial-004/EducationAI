@@ -21,7 +21,7 @@ export function AdminCourseAdder() {
     const handleAddCourse = async (topic: string) => {
         setLoading(topic);
         try {
-            await generateCourse(topic); // Сіздің дайын кодыңызды қолданады
+            await generateCourse(topic, "Kazakh"); // Сіздің дайын кодыңызды қолданады
             router.refresh();
         } catch (error) {
             console.error(error);
