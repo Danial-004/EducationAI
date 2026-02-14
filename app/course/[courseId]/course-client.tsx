@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from "next/navigation"; // 👈 Router қосамыз
 import { Button } from '@/components/ui/button';
-import { ChevronRight, CheckCircle, Loader2 } from 'lucide-react';
+import { ChevronRight, CheckCircle, Loader2, RefreshCw, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
 import { MarkdownText } from '@/components/markdown-text';
-import { VideoPlayer } from '@/components/video-player';
 import { generateLessonContent } from '@/app/actions/generate-lesson';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from "sonner";
@@ -32,40 +32,50 @@ export function CoursePageClient({
     nextMaterial
 }: CoursePageClientProps) {
     const { t } = useLanguage();
+    const router = useRouter(); // Серверді жаңарту үшін
 
-    const [content, setContent] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
+    // Басында контент болса қоямыз, болмаса бос
+    const [content, setContent] = useState(activeMaterial?.content || "");
+    // Егер контент бос болса -> Жүктелу күйін TRUE қыламыз
+    const [isLoading, setIsLoading] = useState(!activeMaterial?.content || activeMaterial.content.length < 50);
 
-    // САБАҚ АУЫСҚАНДА
+    // САБАҚ АУЫСҚАНДА ЖҰМЫС ІСТЕЙТІН КОД
     useEffect(() => {
         if (!activeMaterial) return;
 
-        // 1. ЭКРАНДЫ ТАЗАЛАЙМЫЗ (Ескі мәтін қалмауы үшін)
-        setContent("");
-        setIsLoading(false);
-
-        // 2. БАЗАДА БАР МА?
+        // 1. Егер базада дайын мәтін болса
         if (activeMaterial.content && activeMaterial.content.length > 50) {
-            // Бар болса, серверден қайта сұрамаймыз, бірден көрсетеміз
             setContent(activeMaterial.content);
+            setIsLoading(false); // Жүктелуді тоқтатамыз
         } else {
-            // Жоқ болса, генерация жасаймыз
+            // 2. Егер база бос болса -> Скелетонды қосамыз да, генерация бастаймыз
+            setContent("");
+            setIsLoading(true); // 🔥 МІНДЕТТІ ТҮРДЕ TRUE
             loadNewLesson(activeMaterial.id);
         }
 
     }, [activeMaterial?.id]);
 
     const loadNewLesson = async (id: string) => {
-        setIsLoading(true);
         try {
             const result = await generateLessonContent(id);
             if (result.success && result.content) {
                 setContent(result.content);
+                router.refresh(); // Басқа сабақтарға өткенде дерек жаңарсын
             }
         } catch (error) {
-            toast.error("Қате орын алды.");
+            console.error(error);
+            toast.error("Қате орын алды. Қайта көріңіз.");
         } finally {
-            setIsLoading(false);
+            setIsLoading(false); // Тек соңында барып жүктелуді тоқтатамыз
+        }
+    };
+
+    // Қолмен қайта іске қосу (Егер қате шығып қалса ғана керек)
+    const handleRetry = () => {
+        if (activeMaterial) {
+            setIsLoading(true);
+            loadNewLesson(activeMaterial.id);
         }
     };
 
@@ -91,21 +101,46 @@ export function CoursePageClient({
             </div>
 
             <div className="prose prose-zinc dark:prose-invert max-w-none mb-8 min-h-[400px]">
+
+                {/* 1. ЖҮКТЕЛУ КЕЗІ (Skeleton) - Аппақ экран болмас үшін */}
                 {isLoading ? (
-                    <div className="space-y-6 py-10 animate-pulse">
+                    <div className="space-y-6 py-6 animate-pulse">
                         <div className="flex items-center gap-3 text-blue-600 font-medium">
                             <Loader2 className="h-5 w-5 animate-spin" />
                             <span>AI мұғалім сабақты жазуда... (Күте тұрыңыз)</span>
                         </div>
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-5/6" />
-                        <Skeleton className="h-32 w-full rounded-lg" />
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-[90%]" />
+                            <Skeleton className="h-4 w-[95%]" />
+                        </div>
+                        <Skeleton className="h-32 w-full rounded-lg mt-4" />
+                        <div className="space-y-2 mt-4">
+                            <Skeleton className="h-4 w-[92%]" />
+                            <Skeleton className="h-4 w-[88%]" />
+                            <Skeleton className="h-4 w-full" />
+                        </div>
                     </div>
-                ) : (
+                ) : content && content.length > 50 ? (
+                    // 2. ДАЙЫН КОНТЕНТ
                     <MarkdownText content={content} />
+                ) : (
+                    // 3. ЕГЕР ҚАТЕ БОЛЫП, БОС ҚАЛСА (Сақтандыру батырмасы)
+                    <div className="flex flex-col items-center justify-center py-10 border-2 border-dashed rounded-lg bg-muted/30">
+                        <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                            <Sparkles className="h-6 w-6 text-blue-600" />
+                        </div>
+                        <p className="text-muted-foreground mb-4 text-center">
+                            Сабақ мазмұны әлі жүктелмеді.
+                        </p>
+                        <Button onClick={handleRetry} className="bg-blue-600 text-white hover:bg-blue-700">
+                            Сабақты бастау (AI)
+                        </Button>
+                    </div>
                 )}
             </div>
 
+            {/* Тек контент дайын болғанда ғана кнопкаларды шығарамыз */}
             {!isLoading && content.length > 50 && (
                 <div className="flex justify-end pt-8 border-t border-border">
                     {nextMaterial ? (
