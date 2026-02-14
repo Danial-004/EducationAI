@@ -29,12 +29,6 @@ export function NavbarClient({ session }: NavbarClientProps) {
 
         return (
             <div className="flex items-center gap-4">
-                {/* Dashboard батырмасы */}
-                <Link href="/dashboard">
-                    <Button variant="ghost" size="sm">
-                        {t.dashboard}
-                    </Button>
-                </Link>
 
                 {/* ПРОФИЛЬ МӘЗІРІ (User Menu) */}
                 <DropdownMenu>
@@ -59,11 +53,7 @@ export function NavbarClient({ session }: NavbarClientProps) {
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="cursor-pointer">
-                            <User className="mr-2 h-4 w-4" />
-                            <span>Профиль</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
+
                         {/* ШЫҒУ БАТЫРМАСЫ */}
                         <DropdownMenuItem
                             onClick={() => signOut({ callbackUrl: "/" })}
