@@ -1,8 +1,6 @@
 import Link from 'next/link';
 import { auth } from '@/auth';
-import { AuthButton } from '@/components/auth-button';
-import { Button } from '@/components/ui/button';
-import { GraduationCap, LogIn } from 'lucide-react';
+import { GraduationCap } from 'lucide-react';
 import { ModeToggle } from '@/components/mode-toggle';
 import { LanguageSelector } from '@/components/language-selector';
 import { NavbarClient } from '@/components/navbar-client';
@@ -27,31 +25,10 @@ export async function Navbar() {
                 <div className="flex items-center gap-4">
                     <LanguageSelector />
                     <ModeToggle />
-                    {session?.user ? (
-                        <div className="flex items-center gap-3">
-                            {/* User Avatar */}
-                            <div className="flex items-center gap-2">
-                                {session.user.image ? (
-                                    <img
-                                        src={session.user.image}
-                                        alt={session.user.name || 'User'}
-                                        className="h-8 w-8 rounded-full border-2 border-zinc-200 dark:border-zinc-800"
-                                    />
-                                ) : (
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-500 text-sm font-semibold text-white">
-                                        {session.user.name?.charAt(0).toUpperCase() ||
-                                            session.user.email?.charAt(0).toUpperCase() || 'U'}
-                                    </div>
-                                )}
-                                <span className="hidden text-sm font-medium sm:inline-block">
-                                    {session.user.name || session.user.email}
-                                </span>
-                            </div>
-                            <AuthButton />
-                        </div>
-                    ) : (
-                        <NavbarClient session={null} />
-                    )}
+
+                    {/* Барлық логиканы (кірді ме, шықты ма, аватар қандай)
+                        осы компонентке береміз: */}
+                    <NavbarClient session={session} />
                 </div>
             </div>
         </nav>

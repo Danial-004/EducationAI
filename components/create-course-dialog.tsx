@@ -80,7 +80,7 @@ export function CreateCourseDialog() {
                                 <input
                                     value={topic}
                                     onChange={(e) => setTopic(e.target.value)}
-                                    placeholder="Мысалы: Химия, Python..."
+                                    placeholder="Курс тақырыбын енгізіңіз"
                                     className="w-full px-3 py-2 border rounded-md bg-background"
                                     autoFocus
                                 />
