@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next"; // Viewport типі қосыл�
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
+//import { Footer } from "@/components/footer";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/contexts/language-context";
@@ -56,7 +56,7 @@ export default function RootLayout({
             <div className="flex min-h-screen flex-col">
               <Navbar />
               <main className="flex-1">{children}</main>
-              <Footer />
+              {/*<Footer />*/}
             </div>
             <Toaster />
           </LanguageProvider>
