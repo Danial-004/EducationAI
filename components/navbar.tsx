@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { auth } from '@/auth';
 import { GraduationCap } from 'lucide-react';
-import { ModeToggle } from '@/components/mode-toggle';
+{/*import { ModeToggle } from '@/components/mode-toggle';*/ }
 import { LanguageSelector } from '@/components/language-selector';
 import { NavbarClient } from '@/components/navbar-client';
 
@@ -24,7 +24,7 @@ export async function Navbar() {
                 {/* Navigation Links */}
                 <div className="flex items-center gap-4">
                     <LanguageSelector />
-                    <ModeToggle />
+                    {/*<ModeToggle />*/}
 
                     {/* Барлық логиканы (кірді ме, шықты ма, аватар қандай)
                         осы компонентке береміз: */}
