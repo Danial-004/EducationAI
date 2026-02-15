@@ -9,6 +9,8 @@ import { courses, purchases } from "@/lib/db/schema";
 import { eq, inArray, desc } from "drizzle-orm";
 import { CourseCard } from "@/components/course-card";
 import { Mail, Phone, Github } from "lucide-react";
+import { useLanguage } from "@/contexts/language-context";
+import { translations } from "@/lib/translations";
 
 // ⚠️ Админ почтасы
 const ADMIN_EMAIL = "danialsuttibaev@gmail.com";
@@ -22,6 +24,8 @@ const CONTACT_INFO = {
 
 export default async function DashboardPage() {
     const session = await auth();
+    const { language } = useLanguage();
+    const t = translations[language];
 
     if (!session?.user || !session.user.id) {
         return redirect("/auth");
@@ -114,10 +118,10 @@ export default async function DashboardPage() {
                         {/* Сол жағы: Мәтін */}
                         <div className="space-y-1">
                             <h4 className="font-bold text-lg text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                                📞 Байланыс орталығы
+                                📞 {t.contactTitle}
                             </h4>
                             <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md">
-                                Сұрақтарыңыз болса немесе курс ашылмаса, бізге хабарласыңыз.
+                                {t.contactDesc}
                             </p>
                         </div>
 
@@ -147,10 +151,10 @@ export default async function DashboardPage() {
                                 <Github className="h-4 w-4" />
                             </a>
                             <a href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">
-                                Privacy Policy
+                                {t.privacyPolicy}
                             </a>
                             <a href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">
-                                Terms of Service
+                                {t.termsOfService}
                             </a>
                         </div>
                     </div>

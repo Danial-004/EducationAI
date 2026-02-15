@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { LogIn, LogOut, User } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
 import { signOut } from "next-auth/react"; // Шығу функциясы
+import { translations } from "@/lib/translations";
 import {
     DropdownMenu,
     DropdownMenuContent,

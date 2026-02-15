@@ -68,11 +68,18 @@ export interface Translations {
     feature3Title: string;
     feature3Desc: string;
 
+    logout: string;
+    contactTitle: string;
+    contactDesc: string;
+    rightsReserved: string;
+    privacyPolicy: string;
+    termsOfService: string;
+
 }
 
 export const translations: Record<Language, Translations> = {
     en: {
-        dashboard: 'Dashboard',
+        dashboard: 'Welcome!',
         availableCourses: 'Available Courses',
         coursesStarted: 'Courses Started',
         averageScore: 'Average Score',
@@ -127,9 +134,16 @@ export const translations: Record<Language, Translations> = {
         feature2Desc: 'Get instant help powered by AI.',
         feature3Title: 'Progress Tracking',
         feature3Desc: 'Monitor your learning journey with detailed analytics.',
+        logout: "Logout",
+        contactTitle: "Contact Support",
+        contactDesc: "If you have any questions or the course doesn't open, please contact us.",
+        rightsReserved: "All rights reserved",
+        privacyPolicy: "Privacy Policy",
+        termsOfService: "Terms of Service",
+
     },
     ru: {
-        dashboard: 'Панель управления',
+        dashboard: 'Добро пожаловать!',
         availableCourses: 'Доступные курсы',
         coursesStarted: 'Начатые курсы',
         averageScore: 'Средний балл',
@@ -184,6 +198,13 @@ export const translations: Record<Language, Translations> = {
         feature2Desc: 'Мгновенная помощь на базе ИИ.',
         feature3Title: 'Отслеживание прогресса',
         feature3Desc: 'Следите за своим обучением с подробной аналитикой.',
+        logout: "Выйти",
+        contactTitle: "Центр поддержки",
+        contactDesc: "Если у вас возникли вопросы или курс не открывается, свяжитесь с нами.",
+        rightsReserved: "Все права защищены",
+        privacyPolicy: "Политика конфиденциальности",
+        termsOfService: "Условия использования",
+
     },
     kz: {
         dashboard: 'Басқару тақтасы',
@@ -241,5 +262,11 @@ export const translations: Record<Language, Translations> = {
         feature2Desc: 'ЖИ негізіндегі жылдам көмек.',
         feature3Title: 'Прогресті бақылау',
         feature3Desc: 'Толық аналитика арқылы оқу жолыңызды қадағалаңыз.',
+        logout: "Шығу",
+        contactTitle: "Байланыс орталығы",
+        contactDesc: "Сұрақтарыңыз болса немесе курс ашылмаса, бізге хабарласыңыз.",
+        rightsReserved: "Барлық құқықтар қорғалған",
+        privacyPolicy: "Құпиялылық саясаты",
+        termsOfService: "Пайдалану шарттары",
     },
 };
