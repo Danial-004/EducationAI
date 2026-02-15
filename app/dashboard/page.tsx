@@ -24,8 +24,8 @@ const CONTACT_INFO = {
 
 export default async function DashboardPage() {
     const session = await auth();
-    const { language } = useLanguage();
-    const t = translations[language];
+    {/*const { language } = useLanguage();*/ }
+    const t = translations["kz"];
 
     if (!session?.user || !session.user.id) {
         return redirect("/auth");

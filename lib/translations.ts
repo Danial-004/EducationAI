@@ -27,6 +27,7 @@ export interface Translations {
     days: string;
     keepItUp: string;
     topLearner: string;
+    enroll: string;
 
     // Navigation
     signIn: string;
@@ -140,7 +141,7 @@ export const translations: Record<Language, Translations> = {
         rightsReserved: "All rights reserved",
         privacyPolicy: "Privacy Policy",
         termsOfService: "Terms of Service",
-
+        enroll: "Enroll",
     },
     ru: {
         dashboard: 'Добро пожаловать!',
@@ -204,7 +205,7 @@ export const translations: Record<Language, Translations> = {
         rightsReserved: "Все права защищены",
         privacyPolicy: "Политика конфиденциальности",
         termsOfService: "Условия использования",
-
+        enroll: "Записаться",
     },
     kz: {
         dashboard: 'Басқару тақтасы',
@@ -268,5 +269,6 @@ export const translations: Record<Language, Translations> = {
         rightsReserved: "Барлық құқықтар қорғалған",
         privacyPolicy: "Құпиялылық саясаты",
         termsOfService: "Пайдалану шарттары",
+        enroll: "Қосылу",
     },
 };
