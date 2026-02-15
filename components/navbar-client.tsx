@@ -61,7 +61,7 @@ export function NavbarClient({ session }: NavbarClientProps) {
                             className="text-red-600 cursor-pointer focus:text-red-600 focus:bg-red-50"
                         >
                             <LogOut className="mr-2 h-4 w-4" />
-                            <span>Шығу</span>
+                            <span>{t.logout}</span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
