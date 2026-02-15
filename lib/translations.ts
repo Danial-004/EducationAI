@@ -208,7 +208,7 @@ export const translations: Record<Language, Translations> = {
         enroll: "Записаться",
     },
     kz: {
-        dashboard: 'Басқару тақтасы',
+        dashboard: 'Қош келдіңіз!',
         availableCourses: 'Қолжетімді курстар',
         coursesStarted: 'Бастаған курстар',
         averageScore: 'Орташа балл',
