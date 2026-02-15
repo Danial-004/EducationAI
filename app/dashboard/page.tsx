@@ -60,7 +60,6 @@ export default async function DashboardPage() {
     return (
         <div className="flex flex-col min-h-screen">
             <div className="flex-1 space-y-4 p-8 pt-6 pb-20">
-
                 {/* Header */}
                 <div className="flex items-center justify-between space-y-2">
                     <DashboardHeader userName={session.user.name} />
@@ -106,70 +105,58 @@ export default async function DashboardPage() {
                 </CoursesSection>
             </div>
 
-            {/* 👇 ЖАҢАРТЫЛҒАН FOOTER (БАРЛЫҒЫ БІР БЛОКТА) */}
-            <div className="mt-auto w-full border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-                <div className="container mx-auto px-6 py-10">
+            {/* 👇 ЖАҢАРТЫЛҒАН FOOTER (FULL WIDTH / ТОЛЫҚ ЭКРАН) */}
+            {/* Карточка емес, енді бұл толыққанды подвал */}
+            <footer className="w-full mt-auto bg-slate-100 dark:bg-zinc-900 border-t border-slate-200 dark:border-zinc-800">
+                <div className="container mx-auto px-6 py-8"> {/* Padding азайттым */}
 
-                    {/* КӨК КАРТОЧКА */}
-                    <div className="bg-blue-50 dark:bg-slate-900 rounded-2xl border border-blue-100 dark:border-slate-800 p-8">
-
-                        {/* Жоғарғы жағы: Контактылар */}
-                        <div className="flex flex-col md:flex-row justify-between gap-8 mb-8">
-                            <div className="space-y-2">
-                                <h4 className="font-bold text-xl text-blue-900 dark:text-blue-100 flex items-center gap-2">
-                                    📞 Курсқа қатысты сұрақтар бойынша
-                                </h4>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm">
-                                    Курс ашылмай жатса немесе сұрақтарыңыз болса, бізге жазыңыз.
-                                </p>
-                            </div>
-
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                <a href={`mailto:${CONTACT_INFO.email}`} className="flex items-center gap-3 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-all">
-                                    <div className="bg-blue-100 p-2 rounded-full text-blue-600">
-                                        <Mail className="h-5 w-5" />
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] uppercase text-slate-400 font-bold tracking-wider">Email</p>
-                                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{CONTACT_INFO.email}</p>
-                                    </div>
-                                </a>
-
-                                <div className="flex items-center gap-3 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
-                                    <div className="bg-green-100 p-2 rounded-full text-green-600">
-                                        <Phone className="h-5 w-5" />
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] uppercase text-slate-400 font-bold tracking-wider">WhatsApp</p>
-                                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{CONTACT_INFO.phone}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Астыңғы жағы: Copyright (Сызықпен бөлінген) */}
-                        <div className="pt-6 border-t border-blue-200 dark:border-slate-700 flex flex-col md:flex-row items-center justify-between gap-4">
-                            <p className="text-sm text-slate-500 dark:text-slate-400">
-                                © {currentYear} Education AI. All rights reserved.
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        {/* Сол жағы: Мәтін */}
+                        <div className="space-y-1">
+                            <h4 className="font-bold text-lg text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                                📞 Байланыс орталығы
+                            </h4>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md">
+                                Сұрақтарыңыз болса немесе курс ашылмаса, бізге хабарласыңыз.
                             </p>
-
-                            <div className="flex items-center gap-6">
-                                <a href="https://github.com" target="_blank" className="text-slate-400 hover:text-blue-600 transition-colors">
-                                    <Github className="h-5 w-5" />
-                                </a>
-                                <span className="text-slate-300">|</span>
-                                <a href="#" className="text-sm text-slate-500 hover:text-blue-600 transition-colors">
-                                    Privacy Policy
-                                </a>
-                                <a href="#" className="text-sm text-slate-500 hover:text-blue-600 transition-colors">
-                                    Terms of Service
-                                </a>
-                            </div>
                         </div>
 
+                        {/* Оң жағы: Кнопкалар (Кішірейтілді) */}
+                        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                            <a href={`mailto:${CONTACT_INFO.email}`} className="flex items-center justify-center gap-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-50 transition-colors">
+                                <Mail className="h-4 w-4 text-blue-600" />
+                                <span className="text-sm font-medium text-slate-700 dark:text-slate-200">danialsuttibaev@gmail.com</span>
+                            </a>
+
+                            <div className="flex items-center justify-center gap-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
+                                <Phone className="h-4 w-4 text-green-600" />
+                                <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{CONTACT_INFO.phone}</span>
+                            </div>
+                        </div>
                     </div>
+
+                    {/* Бөлгіш сызық */}
+                    <div className="my-6 border-t border-slate-200 dark:border-zinc-700" />
+
+                    {/* Ең асты: Copyright */}
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
+                        <p>© {currentYear} Education AI. All rights reserved.</p>
+
+                        <div className="flex items-center gap-6">
+                            <a href="https://github.com" target="_blank" className="hover:text-slate-900 dark:hover:text-white transition-colors">
+                                <Github className="h-4 w-4" />
+                            </a>
+                            <a href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">
+                                Privacy Policy
+                            </a>
+                            <a href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">
+                                Terms of Service
+                            </a>
+                        </div>
+                    </div>
+
                 </div>
-            </div>
+            </footer>
         </div>
     );
 }
