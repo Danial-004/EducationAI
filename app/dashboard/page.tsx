@@ -3,10 +3,9 @@ import { redirect } from "next/navigation";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardStats } from "@/components/dashboard/stats-cards";
 import { CoursesSection } from "@/components/dashboard/courses-section";
-import { CreateCourseDialog } from "@/components/create-course-dialog"; // Батырманы импорттау
+import { CreateCourseDialog } from "@/components/create-course-dialog";
 import { db } from "@/lib/db";
-import { courses } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { courses } from "@/lib/db/schema"; // eq импорты керек емес болса алып тастаңыз
 import { CourseCard } from "@/components/course-card";
 
 // ⚠️ МАҢЫЗДЫ: Мына жерге өзіңіздің Google почтаңызды жазыңыз!
@@ -20,9 +19,11 @@ export default async function DashboardPage() {
         return redirect("/auth");
     }
 
+    // 👇 ЖАҢА ҚОСЫЛҒАН ЖЕР: Админ бе, жоқ па тексереміз
+    const isAdmin = session.user.email === ADMIN_EMAIL;
+
     // 2. Базадан курстарды аламыз
     const userCourses = await db.query.courses.findMany({
-        //where: eq(courses.userId, session.user.id),
         with: {
             modules: {
                 with: {
@@ -33,7 +34,6 @@ export default async function DashboardPage() {
         orderBy: (courses, { desc }) => [desc(courses.createdAt)],
     });
 
-    // User статистикасы (әзірге жасанды деректер, кейін түзеуге болады)
     const userData = {
         xp: 0,
         streak: 0,
@@ -46,7 +46,7 @@ export default async function DashboardPage() {
                 <DashboardHeader userName={session.user.name} />
 
                 {/* 👇 БАТЫРМА: Тек админ почтасымен кіргенде ғана шығады */}
-                {session.user.email === ADMIN_EMAIL && (
+                {isAdmin && (
                     <CreateCourseDialog />
                 )}
             </div>
@@ -57,24 +57,25 @@ export default async function DashboardPage() {
                 {userCourses.length > 0 ? (
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {userCourses.map((course) => (
-                            // 👇 CourseCard-қа деректерді бөлек-бөлек, дұрыс жібереміз
                             <CourseCard
                                 key={course.id}
                                 id={course.id}
                                 title={course.title}
                                 description={course.description}
-                                chaptersLength={course.modules.length} // Модуль санын есептейміз
+                                chaptersLength={course.modules.length}
                                 price={0}
                                 progress={null}
                                 category="General"
                                 imageUrl={null}
+                                // 👇 ЖАҢА ҚОСЫЛҒАН ЖЕР: Карточкаға "Сен админсің" деп айтамыз
+                                isAdmin={isAdmin}
                             />
                         ))}
                     </div>
                 ) : (
                     <div className="text-center py-10">
                         <p className="text-muted-foreground">
-                            {session.user.email === ADMIN_EMAIL
+                            {isAdmin
                                 ? "Курстар жоқ. Жоғарыдағы батырманы басып, сататын курстарыңызды жасаңыз!"
                                 : "Әзірге курстар жоқ."}
                         </p>

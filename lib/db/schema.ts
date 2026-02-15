@@ -11,6 +11,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import type { AdapterAccountType } from 'next-auth/adapters';
 
+
 // ============================================================================
 // NextAuth v5 Standard Schema
 // ============================================================================
@@ -151,6 +152,15 @@ export const userProgress = pgTable('user_progress', {
     timeTaken: integer('timeTaken').notNull().default(0), // Time in seconds
     createdAt: timestamp('createdAt', { mode: 'date' }).defaultNow().notNull(),
     updatedAt: timestamp('updatedAt', { mode: 'date' }).defaultNow().notNull(),
+});
+
+export const purchases = pgTable("purchase", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("userId").notNull(),     // Кімге доступ береміз? (ID арқылы)
+    courseId: uuid("courseId")            // Қай курсқа? (courseId uuid болса)
+        .references(() => courses.id, { onDelete: "cascade" })
+        .notNull(),
+    createdAt: timestamp("createdAt").defaultNow(),
 });
 
 // ============================================================================
